@@ -33,8 +33,32 @@ def packet_filter(packets, args):
     filtered_packets = []
     
     for packet in packets:
-        pass
+        #print(packet.summary())
+        # checks if filtered packets is equal to the number of packets requested
+        if args.c and len(filtered_packets) == args.c:
+            break
 
+        # filters by host
+        if args.host:
+            if args.host in packet.summary():
+                filtered_packets.append(packet)
+        
+        # filters by port
+        if args.port:
+            if packet.haslayer(scapy.TCP) and args.port == packet[scapy.TCP].dport:
+                filtered_packets.append(packet)
+            elif packet.haslayer(scapy.UDP) and args.port == packet[scapy.UDP].dport:
+                filtered_packets.append(packet)
+        
+        # filters by IP
+        if args.ip:
+            if args.ip in packet.summary():
+                filtered_packets.append(packet)
+
+        # if no arguments are passed, just add the packet
+        if (not args.host) and (not args.port) and (not args.ip) and (not args.tcp) and (not args.udp) and (not args.icmp) and (not args.net):
+            filtered_packets.append(packet)
+    
     return filtered_packets
     
 def main():
@@ -43,9 +67,11 @@ def main():
     if packets == -1:
         return
     else:
-        # print(packets)
-        packet_filter(packets, args)
+        filtered_packets = packet_filter(packets, args)
 
+    for packet in filtered_packets:
+        print(packet.show())
+        print("\n\n")
 
 
 
