@@ -48,3 +48,11 @@ python pktsniffer.py -r <path_to_pcap> [optional_filters]
    ```
    python pktsniffer.py -r capture.pcap -tcp
    ```
+---
+
+## References:
+- https://www.sphinx-doc.org/en/master/tutorial/describing-code.html
+- https://docs.python.org/3/library/argparse.html
+- https://scapy.readthedocs.io/en/latest/usage.html#reading-pcap-files
+- https://0xbharath.github.io/art-of-packet-crafting-with-scapy/networking/packet_headers/index.html
+- https://en.wikipedia.org/wiki/List_of_IP_protocol_numbers

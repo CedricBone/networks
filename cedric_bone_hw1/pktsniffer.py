@@ -1,3 +1,16 @@
+"""
+pktsniffer.py
+
+packet sniffer that:
+1. Reads packets from a .pcap file using Scapy
+2. Filters by host, IP, port, network, or protocol
+3. Prints packet details
+
+Usage:
+    python pktsniffer.py -r file.pcap [filters...]
+"""
+#https://www.sphinx-doc.org/en/master/tutorial/describing-code.html
+
 import argparse
 import os
 import scapy.all as scapy
@@ -6,6 +19,12 @@ import json
 # Function to parse command line arguments
 # https://docs.python.org/3/library/argparse.html
 def arguments():
+    """
+    Parse command line arguments.
+
+    :return: Parsed arguments from command line
+    :rtype: argparse.Namespace
+    """
     parser = argparse.ArgumentParser(description="Packet Sniffer")
     parser.add_argument("-r", required=True, help="Path to pcap")
     parser.add_argument("-c", type=int, help="Limit number of packets")
@@ -22,6 +41,14 @@ def arguments():
 # Function to read pcap file
 # https://scapy.readthedocs.io/en/latest/usage.html#reading-pcap-files
 def read_file(args):
+    """
+    Read packets from the .pcap file and convert each into a JSON dict.
+
+    :param args: arguments from command line
+    :type args: argparse.Namespace
+    :return: List of packet JSON dicts
+    :rtype: list
+    """
     if os.path.exists(args.r) and args.r.endswith('.pcap'):
         scapy_packets = scapy.rdpcap(args.r)
         packet_list = []
@@ -36,6 +63,16 @@ def read_file(args):
 # https://0xbharath.github.io/art-of-packet-crafting-with-scapy/networking/packet_headers/index.html
 # https://en.wikipedia.org/wiki/List_of_IP_protocol_numbers
 def packet_filter(packets, args):
+    """
+    Filter packets based on arguments
+
+    :param packets: List of packet dictionaries
+    :type packets: list
+    :param args: arguments specifying filters
+    :type args: argparse
+    :return: List of filtered packets
+    :rtype: list
+    """
     filtered_packets = []
     count = 0
 
@@ -108,6 +145,15 @@ def packet_filter(packets, args):
     return filtered_packets
 
 def print_packet(packet):
+    """
+    Print the details of a single packet:
+      1. Ethernet layer 
+      2. IP layer
+      3. Encapsulated protocols
+
+    :param packet: dictionary parsed packet
+    :type packet: dict
+    """
     next_layer = ip_header.get("payload", {})
     sport = next_layer.get("sport", "N/A")
     dport = next_layer.get("dport", "N/A")
@@ -144,6 +190,13 @@ def print_packet(packet):
     print("#" * 50, "\n")
 
 def main():
+    """
+    Main for pktsniffer.py
+    1. Parse arguments
+    2. Read pcap file
+    3. Filter packets
+    4. Print results
+    """
     args = arguments()
     packets = read_file(args)
     if packets == []:
