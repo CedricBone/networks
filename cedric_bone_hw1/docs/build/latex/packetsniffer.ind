@@ -1,0 +1,27 @@
+\begin{sphinxtheindex}
+\let\bigletter\sphinxstyleindexlettergroup
+\let\spxpagem \sphinxstyleindexpagemain
+\let\spxentry \sphinxstyleindexentry
+\let\spxextra \sphinxstyleindexextra
+
+  \bigletter A
+  \item \spxentry{arguments()}\spxextra{in module pktsniffer}, \hyperpage{3}
+
+  \indexspace
+  \bigletter M
+  \item \spxentry{main()}\spxextra{in module pktsniffer}, \hyperpage{3}
+  \item \spxentry{module}
+    \subitem \spxentry{pktsniffer}, \hyperpage{3}
+
+  \indexspace
+  \bigletter P
+  \item \spxentry{packet\_filter()}\spxextra{in module pktsniffer}, \hyperpage{3}
+  \item \spxentry{pktsniffer}
+    \subitem \spxentry{module}, \hyperpage{3}
+  \item \spxentry{print\_packet()}\spxextra{in module pktsniffer}, \hyperpage{3}
+
+  \indexspace
+  \bigletter R
+  \item \spxentry{read\_file()}\spxextra{in module pktsniffer}, \hyperpage{3}
+
+\end{sphinxtheindex}

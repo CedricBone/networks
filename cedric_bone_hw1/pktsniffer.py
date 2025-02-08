@@ -154,6 +154,7 @@ def print_packet(packet):
     :param packet: dictionary parsed packet
     :type packet: dict
     """
+    ip_header = packet.get("payload", {})
     next_layer = ip_header.get("payload", {})
     sport = next_layer.get("sport", "N/A")
     dport = next_layer.get("dport", "N/A")
@@ -167,7 +168,6 @@ def print_packet(packet):
     print("-" * 50)
 
     #IP Header: Version, Header length, Type of service, Total length, Identification, Flags, Fragment offset, Time to live, Protocol, Header checksum, Source and Destination IP addresses.
-    ip_header = packet.get("payload", {})
     print("IP Header:")
     print(f"Version: {ip_header.get('version', 'N/A')}")
     print(f"Header length: {ip_header.get('ihl', 'N/A')}")

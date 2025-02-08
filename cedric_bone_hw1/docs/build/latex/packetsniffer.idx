@@ -1,0 +1,7 @@
+\indexentry{module@\spxentry{module}!pktsniffer@\spxentry{pktsniffer}|hyperpage}{3}
+\indexentry{pktsniffer@\spxentry{pktsniffer}!module@\spxentry{module}|hyperpage}{3}
+\indexentry{arguments() (in module pktsniffer)@\spxentry{arguments()}\spxextra{in module pktsniffer}|hyperpage}{3}
+\indexentry{main() (in module pktsniffer)@\spxentry{main()}\spxextra{in module pktsniffer}|hyperpage}{3}
+\indexentry{packet\_filter() (in module pktsniffer)@\spxentry{packet\_filter()}\spxextra{in module pktsniffer}|hyperpage}{3}
+\indexentry{print\_packet() (in module pktsniffer)@\spxentry{print\_packet()}\spxextra{in module pktsniffer}|hyperpage}{3}
+\indexentry{read\_file() (in module pktsniffer)@\spxentry{read\_file()}\spxextra{in module pktsniffer}|hyperpage}{3}
