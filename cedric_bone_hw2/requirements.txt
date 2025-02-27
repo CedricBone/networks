@@ -1,5 +1,1 @@
-Are we allowed to use:
-- os.system(f"ping {param} 1 {hostname}")
-- pythonping
-
-Otherwise sockets?
+scapy>=2.4.5
