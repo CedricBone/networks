@@ -1,8 +1,8 @@
 """
 my_traceroute.py
 
-Python implementation of traceroute command that maps network path to destination.
-Sends UDP probes with incrementing TTL values to discover intermediate routers.
+Python implementation of traceroute command.
+Sends UDP probes with incrementing TTL values.
 
 Usage:
     sudo python my_traceroute.py [-n] [-q NQUERIES] [-S] destination

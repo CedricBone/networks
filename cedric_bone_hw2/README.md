@@ -27,9 +27,6 @@ Options:
 - `-n`: Print addresses numerically only
 - `-q NQUERIES`: Set probes per TTL (default: 3)
 - `-S`: Print summary of unanswered probes
-- `-f FIRST_TTL`: Start from this TTL (default: 1)
-- `-m MAX_TTL`: Set max hops (default: 30)
-- `-w WAIT`: Set response wait time (default: 2.0)
 
 Example:
 ```bash

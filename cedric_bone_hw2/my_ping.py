@@ -1,7 +1,7 @@
 """
 my_ping.py
 
-Python implementation of ping command that tests network connectivity.
+Python implementation of ping command.
 Sends ICMP echo requests and measures round-trip time.
 
 Usage:
