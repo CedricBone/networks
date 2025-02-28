@@ -1,0 +1,31 @@
+\begin{sphinxtheindex}
+\let\bigletter\sphinxstyleindexlettergroup
+\let\spxpagem \sphinxstyleindexpagemain
+\let\spxentry \sphinxstyleindexentry
+\let\spxextra \sphinxstyleindexextra
+
+  \bigletter H
+  \item \spxentry{handle\_interrupt()}\spxextra{in module my\_ping}, \hyperpage{3}
+
+  \indexspace
+  \bigletter M
+  \item \spxentry{main()}\spxextra{in module my\_ping}, \hyperpage{3}
+  \item \spxentry{main()}\spxextra{in module my\_traceroute}, \hyperpage{5}
+  \item \spxentry{module}
+    \subitem \spxentry{my\_ping}, \hyperpage{3}
+    \subitem \spxentry{my\_traceroute}, \hyperpage{5}
+  \item \spxentry{my\_ping}
+    \subitem \spxentry{module}, \hyperpage{3}
+  \item \spxentry{my\_traceroute}
+    \subitem \spxentry{module}, \hyperpage{5}
+
+  \indexspace
+  \bigletter P
+  \item \spxentry{print\_stats()}\spxextra{in module my\_ping}, \hyperpage{3}
+
+  \indexspace
+  \bigletter S
+  \item \spxentry{send\_ping()}\spxextra{in module my\_ping}, \hyperpage{3}
+  \item \spxentry{send\_probe()}\spxextra{in module my\_traceroute}, \hyperpage{5}
+
+\end{sphinxtheindex}

@@ -1,0 +1,10 @@
+\indexentry{module@\spxentry{module}!my\_ping@\spxentry{my\_ping}|hyperpage}{3}
+\indexentry{my\_ping@\spxentry{my\_ping}!module@\spxentry{module}|hyperpage}{3}
+\indexentry{handle\_interrupt() (in module my\_ping)@\spxentry{handle\_interrupt()}\spxextra{in module my\_ping}|hyperpage}{3}
+\indexentry{main() (in module my\_ping)@\spxentry{main()}\spxextra{in module my\_ping}|hyperpage}{3}
+\indexentry{print\_stats() (in module my\_ping)@\spxentry{print\_stats()}\spxextra{in module my\_ping}|hyperpage}{3}
+\indexentry{send\_ping() (in module my\_ping)@\spxentry{send\_ping()}\spxextra{in module my\_ping}|hyperpage}{3}
+\indexentry{module@\spxentry{module}!my\_traceroute@\spxentry{my\_traceroute}|hyperpage}{5}
+\indexentry{my\_traceroute@\spxentry{my\_traceroute}!module@\spxentry{module}|hyperpage}{5}
+\indexentry{main() (in module my\_traceroute)@\spxentry{main()}\spxextra{in module my\_traceroute}|hyperpage}{5}
+\indexentry{send\_probe() (in module my\_traceroute)@\spxentry{send\_probe()}\spxextra{in module my\_traceroute}|hyperpage}{5}
