@@ -99,7 +99,7 @@ documentation for details.
 my\_ping.py
 
 \sphinxAtStartPar
-Python implementation of ping command that tests network connectivity.
+Python implementation of ping command.
 Sends ICMP echo requests and measures round\sphinxhyphen{}trip time.
 \begin{description}
 \sphinxlineitem{Usage:}
@@ -118,17 +118,16 @@ python my\_ping.py {[}\sphinxhyphen{}c COUNT{]} {[}\sphinxhyphen{}i WAIT{]} {[}\
 {}
 \pysigstopsignatures
 \sphinxAtStartPar
-Handle Ctrl+C interrupt.
-Print statistics and exit gracefully.
+Handle Ctrl+C
 \begin{description}
 \sphinxlineitem{Parameters:}
 \sphinxAtStartPar
 signum: Signal number
-frame: Current stack frame
+frame: Current frame
 sent\_count: Total packets sent
 received\_count: Total responses received
 rtts: List of round\sphinxhyphen{}trip times
-destination: Target hostname or IP
+destination: Target IP
 
 \end{description}
 
@@ -145,8 +144,8 @@ destination: Target hostname or IP
 {}
 \pysigstopsignatures
 \sphinxAtStartPar
-Parse command line arguments and execute ping.
-Sends ICMP echo requests and displays results.
+Parse command line arguments and do ping.
+ICMP echo requests and displays results.
 
 \end{fulllineitems}
 
@@ -161,13 +160,13 @@ Sends ICMP echo requests and displays results.
 {}
 \pysigstopsignatures
 \sphinxAtStartPar
-Print ping statistics summary.
+Print ping summary
 \begin{description}
 \sphinxlineitem{Parameters:}
 \sphinxAtStartPar
-sent\_count: Total number of packets sent
-received\_count: Total number of responses received
-rtts: List of round\sphinxhyphen{}trip times in milliseconds
+sent\_count: Total number sent
+received\_count: Total number received
+rtts: List of round\sphinxhyphen{}trip times
 destination: Target hostname or IP
 
 \end{description}
@@ -185,15 +184,15 @@ destination: Target hostname or IP
 {}
 \pysigstopsignatures
 \sphinxAtStartPar
-Send a single ping and wait for the response.
+Send a ping and wait for response
 \begin{description}
 \sphinxlineitem{Parameters:}
 \sphinxAtStartPar
 dest\_ip: Destination IP address
 timeout: Maximum wait time for response
-packet\_size: Size of ICMP payload in bytes
-sent\_count: Number of packets sent so far
-received\_count: Number of responses received so far
+packet\_size: Size
+sent\_count: Number of packets sent
+received\_count: Number of responses received
 
 \sphinxlineitem{Returns:}
 \sphinxAtStartPar
@@ -213,12 +212,12 @@ tuple: (success\_bool, rtt\_ms)
 my\_traceroute.py
 
 \sphinxAtStartPar
-Python implementation of traceroute command that maps network path to destination.
-Sends UDP probes with incrementing TTL values to discover intermediate routers.
+Python implementation of traceroute command.
+Sends UDP probes with incrementing TTL values.
 \begin{description}
 \sphinxlineitem{Usage:}
 \sphinxAtStartPar
-sudo python my\_traceroute.py {[}\sphinxhyphen{}n{]} {[}\sphinxhyphen{}q NQUERIES{]} {[}\sphinxhyphen{}S{]} {[}\sphinxhyphen{}f FIRST\_TTL{]} {[}\sphinxhyphen{}m MAX\_TTL{]} {[}\sphinxhyphen{}w WAIT{]} destination
+sudo python my\_traceroute.py {[}\sphinxhyphen{}n{]} {[}\sphinxhyphen{}q NQUERIES{]} {[}\sphinxhyphen{}S{]} destination
 
 \end{description}
 \index{main() (in module my\_traceroute)@\spxentry{main()}\spxextra{in module my\_traceroute}}
@@ -232,8 +231,8 @@ sudo python my\_traceroute.py {[}\sphinxhyphen{}n{]} {[}\sphinxhyphen{}q NQUERIE
 {}
 \pysigstopsignatures
 \sphinxAtStartPar
-Parse command line arguments and execute traceroute.
-Shows network path to destination with response times for each hop.
+Parse arguments and execute traceroute
+Shows network path with response times for each hop
 
 \end{fulllineitems}
 
@@ -248,20 +247,20 @@ Shows network path to destination with response times for each hop.
 {}
 \pysigstopsignatures
 \sphinxAtStartPar
-Send a single traceroute probe and wait for response.
+Send a probe and wait for response
 \begin{description}
 \sphinxlineitem{Parameters:}
 \sphinxAtStartPar
-send\_socket: Socket for sending UDP probes
-recv\_socket: Socket for receiving ICMP responses
-dest\_ip: Destination IP address
-ttl: Time\sphinxhyphen{}to\sphinxhyphen{}live value for this probe
-port: UDP destination port
+send\_socket: Socket for probes
+recv\_socket: Socket for responses
+dest\_ip: Destination IP
+ttl: Time\sphinxhyphen{}to\sphinxhyphen{}live
+port: destination port
 timeout: Maximum wait time for response
 
 \sphinxlineitem{Returns:}
 \sphinxAtStartPar
-tuple: (responding\_ip, elapsed\_time\_ms) or (None, None) on timeout
+tuple: (responding\_ip, elapsed\_time\_ms)
 
 \end{description}
 
