@@ -1,3 +1,15 @@
+"""
+my_ping.py
+
+Python implementation of ping command that tests network connectivity.
+Sends ICMP echo requests and measures round-trip time.
+
+Usage:
+    python my_ping.py [-c COUNT] [-i WAIT] [-s PACKETSIZE] [-t TIMEOUT] destination
+"""
+#https://www.sphinx-doc.org/en/master/tutorial/describing-code.html
+
+
 import argparse
 import os
 import sys
@@ -6,8 +18,20 @@ import signal
 import statistics
 from scapy.all import IP, ICMP, sr1, conf 
 
-# Send a single ping and wait for the response.
 def send_ping(dest_ip, timeout, packet_size, sent_count, received_count):
+    """
+    Send a ping and wait for response
+    
+    Parameters:
+        dest_ip: Destination IP address
+        timeout: Maximum wait time for response
+        packet_size: Size
+        sent_count: Number of packets sent
+        received_count: Number of responses received
+        
+    Returns:
+        tuple: (success_bool, rtt_ms)
+    """
     # Payload of specified size
     payload = "A" * packet_size
     send_time = time.time()
@@ -26,8 +50,16 @@ def send_ping(dest_ip, timeout, packet_size, sent_count, received_count):
         print(f"Request timeout for icmp_seq {sent_count}")
         return False, None
 
-# Print stats summary
 def print_stats(sent_count, received_count, rtts, destination):
+    """
+    Print ping summary
+    
+    Parameters:
+        sent_count: Total number sent
+        received_count: Total number received
+        rtts: List of round-trip times
+        destination: Target hostname or IP
+    """
     if sent_count == 0:
         return
     
@@ -42,12 +74,28 @@ def print_stats(sent_count, received_count, rtts, destination):
         avg_time = statistics.mean(rtts)
         print(f"round-trip min/avg/max = {min_time}/{avg_time}/{max_time} ms")
 
-# Ctrl+C
 def handle_interrupt(signum, frame, sent_count, received_count, rtts, destination):
+    """
+    Handle Ctrl+C
+    
+    Parameters:
+        signum: Signal number
+        frame: Current frame
+        sent_count: Total packets sent
+        received_count: Total responses received
+        rtts: List of round-trip times
+        destination: Target IP
+    """
     print_stats(sent_count, received_count, rtts, destination)
     sys.exit(0)
 
+# Function to parse command line arguments and run ping
+# https://docs.python.org/3/library/argparse.html
 def main():
+    """
+    Parse command line arguments and do ping.
+    ICMP echo requests and displays results.
+    """
     parser = argparse.ArgumentParser(description="A Python implementation of the ping command")
     parser.add_argument("destination", help="Destination hostname or IP address")
     parser.add_argument("-c", "--count", type=int, help="Stop after sending COUNT packets")
