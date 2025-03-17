@@ -1,3 +1,4 @@
+e02c9bc - CedricBone, 2025-02-28 12:20:07 -0500 : Readme update
 88f7229 - CedricBone, 2025-02-28 12:16:35 -0500 : report, updated files with comments, new docs
 480ed30 - CedricBone, 2025-02-28 12:09:44 -0500 : report, updated files with comments, new docs
 11c24f5 - CedricBone, 2025-02-27 19:15:24 -0500 : updates and sphinx documentation
