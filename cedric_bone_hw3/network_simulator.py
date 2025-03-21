@@ -25,14 +25,14 @@ class NetworkSimulator:
             packet = Packet(**packet_dict)
             print(f"Forwarding packet {packet.seq_num} from port {addr[1]}")
             
-            # corruption - corrupt data and recalculate checksum
+            # corruption by changing a random char
             if random.random() < self.corruption_rate:
                 print(f"Corrupting packet {packet.seq_num}")
-                # Corrupt data by changing a random character
                 if packet.data:
                     pos = random.randint(0, len(packet.data)-1)
+                    rand_char = chr(random.randint(0, 127))
                     chars = list(packet.data)
-                    chars[pos] = chr((ord(chars[pos]) + 1) % 128)  # Change one character
+                    chars[pos] = rand_char
                     packet.data = ''.join(chars)
                     packet.checksum = packet.calculate_checksum()
                 
