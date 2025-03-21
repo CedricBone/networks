@@ -2,7 +2,7 @@ import socket
 from packet import Packet
 
 class Receiver:
-    def __init__(self, port=12348, window_size=4):
+    def __init__(self, port=22222, window_size=4):
         self.expected_seq = 0
         self.window_size = window_size
         # Buffer for out-of-order packets
@@ -20,8 +20,15 @@ class Receiver:
         print("Waiting for data...")
         while True:
             data, addr = self.socket.recvfrom(4096)
+            
+            # dict = {"seq_num": seq_num, "data": data, "ack_num": ack_num, "checksum": checksum}
             packet_dict = eval(data.decode())
-            packet = Packet(**packet_dict)
+            packet = Packet(
+                seq_num=packet_dict.get('seq_num'),
+                data=packet_dict.get('data'),
+                ack_num=packet_dict.get('ack_num'),
+                checksum=packet_dict.get('checksum')
+            )
             
             print(f"Received packet {packet.seq_num}")
             
@@ -34,6 +41,7 @@ class Receiver:
             # Check if end
             if packet.data == "END":
                 self.send_ack(packet.seq_num, addr)
+                print("Received END packet")
                 break
             
             # Check order

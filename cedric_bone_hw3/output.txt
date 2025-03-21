@@ -1,0 +1,7 @@
+Binary code analysis involves the examination of compiled executables to infer program behavior, identify vulnerabilities, or detect malicious intent. 
+Traditionally, methods such as symbolic execution and heuristic pattern matching were used  to understand binaries; 
+however, these methods often suffer from scalability issues, lack of portability, and sensitivity to compiler transformations. 
+Over the past few years, deep learning has been an attractive alternative because it offers
+data-driven techniques that automatically learn representations directly from binary data, avoiding extensive manual feature engineering. 
+While deep learning has improved detection rates and reduced false positives, these deep learning models have limitations.
+For example, many models are treated as black boxes, making their decision processes difficult to interpret and sometimes leading to over-reliance on certain features that may not generalize well.

@@ -3,7 +3,7 @@ import time
 from packet import Packet
 
 class Sender:
-    def __init__(self, port=12347, window_size=4):
+    def __init__(self, port=11111, window_size=4):
         self.seq_num = 0
         self.window_size = window_size
         self.window = {} 
@@ -18,7 +18,7 @@ class Sender:
         self.socket.sendto(str(packet.__dict__).encode(), addr)
         print(f"Sent packet {packet.seq_num}")
         
-    def send_file(self, data, receiver_addr=('localhost', 12345)):
+    def send_file(self, data, receiver_addr=('localhost', 33333)):
         # 4 bytes = 32 bits per packet
         size = 4 
         chunks = []
@@ -36,8 +36,18 @@ class Sender:
             
             # ACKs
             try:
-                data, _ = self.socket.recvfrom(4096)
-                ack_packet = Packet(**eval(data.decode()))
+                recv_num = 4096
+                data, addr = self.socket.recvfrom(recv_num)
+                
+                # dict = {"seq_num": seq_num, "data": data, "ack_num": ack_num, "checksum": checksum}
+                packet_dict = eval(data.decode())
+                ack_packet = Packet(
+                    seq_num=packet_dict.get('seq_num'),
+                    data=packet_dict.get('data'),
+                    ack_num=packet_dict.get('ack_num'),
+                    checksum=packet_dict.get('checksum')
+                )
+
                 print(f"Received ACK {ack_packet.ack_num}")
                 
                 if (ack_packet.checksum == ack_packet.calculate_checksum()):
@@ -55,4 +65,27 @@ class Sender:
         
         # Send END
         end_packet = Packet(seq_num=self.seq_num, data="END")
+        print("Sending END packet")
+        received_ack = False
         self.send_packet(end_packet, receiver_addr)
+
+        while not received_ack:
+            try:
+                recv_num = 4096
+                data, addr = self.socket.recvfrom(recv_num)
+                
+                # dict = {"seq_num": seq_num, "data": data, "ack_num": ack_num, "checksum": checksum}
+                packet_dict = eval(data.decode())
+                ack_packet = Packet(
+                    seq_num=packet_dict.get('seq_num'),
+                    data=packet_dict.get('data'),
+                    ack_num=packet_dict.get('ack_num'),
+                    checksum=packet_dict.get('checksum')
+                )
+                
+                if (ack_packet.checksum == ack_packet.calculate_checksum()):
+                    received_ack = True
+            except socket.timeout:
+                self.send_packet(end_packet, receiver_addr)
+
+        print("File transfer completed")
