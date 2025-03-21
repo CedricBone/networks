@@ -1,0 +1,31 @@
+\indexentry{module@\spxentry{module}!main@\spxentry{main}|hyperpage}{3}
+\indexentry{main@\spxentry{main}!module@\spxentry{module}|hyperpage}{3}
+\indexentry{main() (in module main)@\spxentry{main()}\spxextra{in module main}|hyperpage}{3}
+\indexentry{module@\spxentry{module}!network\_simulator@\spxentry{network\_simulator}|hyperpage}{3}
+\indexentry{network\_simulator@\spxentry{network\_simulator}!module@\spxentry{module}|hyperpage}{3}
+\indexentry{NetworkSimulator (class in network\_simulator)@\spxentry{NetworkSimulator}\spxextra{class in network\_simulator}|hyperpage}{3}
+\indexentry{loss\_rate (network\_simulator.NetworkSimulator attribute)@\spxentry{loss\_rate}\spxextra{network\_simulator.NetworkSimulator attribute}|hyperpage}{3}
+\indexentry{corruption\_rate (network\_simulator.NetworkSimulator attribute)@\spxentry{corruption\_rate}\spxextra{network\_simulator.NetworkSimulator attribute}|hyperpage}{3}
+\indexentry{run() (network\_simulator.NetworkSimulator method)@\spxentry{run()}\spxextra{network\_simulator.NetworkSimulator method}|hyperpage}{3}
+\indexentry{module@\spxentry{module}!packet@\spxentry{packet}|hyperpage}{3}
+\indexentry{packet@\spxentry{packet}!module@\spxentry{module}|hyperpage}{3}
+\indexentry{Packet (class in packet)@\spxentry{Packet}\spxextra{class in packet}|hyperpage}{3}
+\indexentry{seq\_num (packet.Packet attribute)@\spxentry{seq\_num}\spxextra{packet.Packet attribute}|hyperpage}{3}
+\indexentry{data (packet.Packet attribute)@\spxentry{data}\spxextra{packet.Packet attribute}|hyperpage}{4}
+\indexentry{ack\_num (packet.Packet attribute)@\spxentry{ack\_num}\spxextra{packet.Packet attribute}|hyperpage}{4}
+\indexentry{checksum (packet.Packet attribute)@\spxentry{checksum}\spxextra{packet.Packet attribute}|hyperpage}{4}
+\indexentry{calculate\_checksum() (packet.Packet method)@\spxentry{calculate\_checksum()}\spxextra{packet.Packet method}|hyperpage}{4}
+\indexentry{module@\spxentry{module}!receiver@\spxentry{receiver}|hyperpage}{4}
+\indexentry{receiver@\spxentry{receiver}!module@\spxentry{module}|hyperpage}{4}
+\indexentry{Receiver (class in receiver)@\spxentry{Receiver}\spxextra{class in receiver}|hyperpage}{4}
+\indexentry{receive\_file() (receiver.Receiver method)@\spxentry{receive\_file()}\spxextra{receiver.Receiver method}|hyperpage}{4}
+\indexentry{send\_ack() (receiver.Receiver method)@\spxentry{send\_ack()}\spxextra{receiver.Receiver method}|hyperpage}{4}
+\indexentry{module@\spxentry{module}!sender@\spxentry{sender}|hyperpage}{4}
+\indexentry{sender@\spxentry{sender}!module@\spxentry{module}|hyperpage}{4}
+\indexentry{Sender (class in sender)@\spxentry{Sender}\spxextra{class in sender}|hyperpage}{4}
+\indexentry{seq\_num (sender.Sender attribute)@\spxentry{seq\_num}\spxextra{sender.Sender attribute}|hyperpage}{4}
+\indexentry{window\_size (sender.Sender attribute)@\spxentry{window\_size}\spxextra{sender.Sender attribute}|hyperpage}{5}
+\indexentry{window (sender.Sender attribute)@\spxentry{window}\spxextra{sender.Sender attribute}|hyperpage}{5}
+\indexentry{base (sender.Sender attribute)@\spxentry{base}\spxextra{sender.Sender attribute}|hyperpage}{5}
+\indexentry{send\_file() (sender.Sender method)@\spxentry{send\_file()}\spxextra{sender.Sender method}|hyperpage}{5}
+\indexentry{send\_packet() (sender.Sender method)@\spxentry{send\_packet()}\spxextra{sender.Sender method}|hyperpage}{5}

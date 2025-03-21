@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sender &#8212; Homework 3  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=27fed22d" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for sender</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Sender</span>
+
+<span class="sd">Implements the sender side of the reliable data transfer protocol.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">socket</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">packet</span><span class="w"> </span><span class="kn">import</span> <span class="n">Packet</span>
+
+<div class="viewcode-block" id="Sender">
+<a class="viewcode-back" href="../sender.html#sender.Sender">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Sender</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implements a sliding window retransmission.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        seq_num (int): Current sequence number</span>
+<span class="sd">        window_size (int): Size of the sliding window</span>
+<span class="sd">        window (dict): Buffer</span>
+<span class="sd">        base (int): Sequence number of the oldest unacknowledged packet</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">11111</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seq_num</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span> <span class="o">=</span> <span class="n">window_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">window</span> <span class="o">=</span> <span class="p">{}</span> 
+
+        <span class="c1"># Oldest unacked packet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="o">=</span> <span class="mi">0</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">socket</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_DGRAM</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">bind</span><span class="p">((</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="n">port</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span> 
+        
+<div class="viewcode-block" id="Sender.send_packet">
+<a class="viewcode-back" href="../sender.html#sender.Sender.send_packet">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">send_packet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">packet</span><span class="p">,</span> <span class="n">addr</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Send a packet to address</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            packet (Packet): Packet to send</span>
+<span class="sd">            addr (tuple): Destination address (host, port)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">sendto</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">packet</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">addr</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sent packet </span><span class="si">{</span><span class="n">packet</span><span class="o">.</span><span class="n">seq_num</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="Sender.send_file">
+<a class="viewcode-back" href="../sender.html#sender.Sender.send_file">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">send_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">receiver_addr</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="mi">33333</span><span class="p">)):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Send a file to address</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (str): Data to send</span>
+<span class="sd">            receiver_addr (tuple): Destination address (host, port)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># 4 bytes = 32 bits per packet</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="mi">4</span> 
+        <span class="n">chunks</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">size</span><span class="p">):</span>
+            <span class="n">chunks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="n">size</span><span class="p">])</span>
+        
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">chunks</span><span class="p">):</span>
+            <span class="c1"># Send window_size packets</span>
+            <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">seq_num</span> <span class="o">&lt;</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">chunks</span><span class="p">)):</span>
+                <span class="n">packet</span> <span class="o">=</span> <span class="n">Packet</span><span class="p">(</span><span class="n">seq_num</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">seq_num</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">chunks</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">seq_num</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">seq_num</span><span class="p">]</span> <span class="o">=</span> <span class="n">packet</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">send_packet</span><span class="p">(</span><span class="n">packet</span><span class="p">,</span> <span class="n">receiver_addr</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">seq_num</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>  
+            
+            <span class="c1"># ACKs</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">recv_num</span> <span class="o">=</span> <span class="mi">4096</span>
+                <span class="n">data</span><span class="p">,</span> <span class="n">addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">recvfrom</span><span class="p">(</span><span class="n">recv_num</span><span class="p">)</span>
+                
+                <span class="c1"># dict = {&quot;seq_num&quot;: seq_num, &quot;data&quot;: data, &quot;ack_num&quot;: ack_num, &quot;checksum&quot;: checksum}</span>
+                <span class="n">packet_dict</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+                <span class="n">ack_packet</span> <span class="o">=</span> <span class="n">Packet</span><span class="p">(</span>
+                    <span class="n">seq_num</span><span class="o">=</span><span class="n">packet_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;seq_num&#39;</span><span class="p">),</span>
+                    <span class="n">data</span><span class="o">=</span><span class="n">packet_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">),</span>
+                    <span class="n">ack_num</span><span class="o">=</span><span class="n">packet_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ack_num&#39;</span><span class="p">),</span>
+                    <span class="n">checksum</span><span class="o">=</span><span class="n">packet_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;checksum&#39;</span><span class="p">)</span>
+                <span class="p">)</span>
+
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Received ACK </span><span class="si">{</span><span class="n">ack_packet</span><span class="o">.</span><span class="n">ack_num</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                
+                <span class="k">if</span> <span class="p">(</span><span class="n">ack_packet</span><span class="o">.</span><span class="n">checksum</span> <span class="o">==</span> <span class="n">ack_packet</span><span class="o">.</span><span class="n">calculate_checksum</span><span class="p">()):</span>
+                    <span class="c1"># Move window forward</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="o">=</span> <span class="n">ack_packet</span><span class="o">.</span><span class="n">ack_num</span> <span class="o">+</span> <span class="mi">1</span>
+                    <span class="c1"># Remove acknowledged packets</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">window</span> <span class="o">=</span> <span class="p">{</span><span class="n">seq</span><span class="p">:</span> <span class="n">pkt</span> <span class="k">for</span> <span class="n">seq</span><span class="p">,</span> <span class="n">pkt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> 
+                                <span class="k">if</span> <span class="n">seq</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base</span><span class="p">}</span>
+            <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">timeout</span><span class="p">:</span>
+                <span class="c1"># resend all packets in window</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Timeout - resending window&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">seq_num</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">seq_num</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">seq_num</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">send_packet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">[</span><span class="n">seq_num</span><span class="p">],</span> <span class="n">receiver_addr</span><span class="p">)</span>
+        
+        <span class="c1"># Send END</span>
+        <span class="n">end_packet</span> <span class="o">=</span> <span class="n">Packet</span><span class="p">(</span><span class="n">seq_num</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">seq_num</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="s2">&quot;END&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sending END packet&quot;</span><span class="p">)</span>
+        <span class="n">received_ack</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_packet</span><span class="p">(</span><span class="n">end_packet</span><span class="p">,</span> <span class="n">receiver_addr</span><span class="p">)</span>
+
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">received_ack</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">recv_num</span> <span class="o">=</span> <span class="mi">4096</span>
+                <span class="n">data</span><span class="p">,</span> <span class="n">addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">recvfrom</span><span class="p">(</span><span class="n">recv_num</span><span class="p">)</span>
+                
+                <span class="c1"># dict = {&quot;seq_num&quot;: seq_num, &quot;data&quot;: data, &quot;ack_num&quot;: ack_num, &quot;checksum&quot;: checksum}</span>
+                <span class="n">packet_dict</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+                <span class="n">ack_packet</span> <span class="o">=</span> <span class="n">Packet</span><span class="p">(</span>
+                    <span class="n">seq_num</span><span class="o">=</span><span class="n">packet_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;seq_num&#39;</span><span class="p">),</span>
+                    <span class="n">data</span><span class="o">=</span><span class="n">packet_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">),</span>
+                    <span class="n">ack_num</span><span class="o">=</span><span class="n">packet_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ack_num&#39;</span><span class="p">),</span>
+                    <span class="n">checksum</span><span class="o">=</span><span class="n">packet_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;checksum&#39;</span><span class="p">)</span>
+                <span class="p">)</span>
+                
+                <span class="k">if</span> <span class="p">(</span><span class="n">ack_packet</span><span class="o">.</span><span class="n">checksum</span> <span class="o">==</span> <span class="n">ack_packet</span><span class="o">.</span><span class="n">calculate_checksum</span><span class="p">()):</span>
+                    <span class="n">received_ack</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">timeout</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">send_packet</span><span class="p">(</span><span class="n">end_packet</span><span class="p">,</span> <span class="n">receiver_addr</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;File transfer completed&quot;</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Homework 3</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">cedric_bone_hw3</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, Cedric Bone.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

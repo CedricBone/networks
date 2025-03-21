@@ -1,0 +1,78 @@
+\begin{sphinxtheindex}
+\let\bigletter\sphinxstyleindexlettergroup
+\let\spxpagem \sphinxstyleindexpagemain
+\let\spxentry \sphinxstyleindexentry
+\let\spxextra \sphinxstyleindexextra
+
+  \bigletter A
+  \item \spxentry{ack\_num}\spxextra{packet.Packet attribute}, \hyperpage{4}
+
+  \indexspace
+  \bigletter B
+  \item \spxentry{base}\spxextra{sender.Sender attribute}, \hyperpage{5}
+
+  \indexspace
+  \bigletter C
+  \item \spxentry{calculate\_checksum()}\spxextra{packet.Packet method}, \hyperpage{4}
+  \item \spxentry{checksum}\spxextra{packet.Packet attribute}, \hyperpage{4}
+  \item \spxentry{corruption\_rate}\spxextra{network\_simulator.NetworkSimulator attribute}, 
+		\hyperpage{3}
+
+  \indexspace
+  \bigletter D
+  \item \spxentry{data}\spxextra{packet.Packet attribute}, \hyperpage{4}
+
+  \indexspace
+  \bigletter L
+  \item \spxentry{loss\_rate}\spxextra{network\_simulator.NetworkSimulator attribute}, 
+		\hyperpage{3}
+
+  \indexspace
+  \bigletter M
+  \item \spxentry{main}
+    \subitem \spxentry{module}, \hyperpage{3}
+  \item \spxentry{main()}\spxextra{in module main}, \hyperpage{3}
+  \item \spxentry{module}
+    \subitem \spxentry{main}, \hyperpage{3}
+    \subitem \spxentry{network\_simulator}, \hyperpage{3}
+    \subitem \spxentry{packet}, \hyperpage{3}
+    \subitem \spxentry{receiver}, \hyperpage{4}
+    \subitem \spxentry{sender}, \hyperpage{4}
+
+  \indexspace
+  \bigletter N
+  \item \spxentry{network\_simulator}
+    \subitem \spxentry{module}, \hyperpage{3}
+  \item \spxentry{NetworkSimulator}\spxextra{class in network\_simulator}, \hyperpage{3}
+
+  \indexspace
+  \bigletter P
+  \item \spxentry{packet}
+    \subitem \spxentry{module}, \hyperpage{3}
+  \item \spxentry{Packet}\spxextra{class in packet}, \hyperpage{3}
+
+  \indexspace
+  \bigletter R
+  \item \spxentry{receive\_file()}\spxextra{receiver.Receiver method}, \hyperpage{4}
+  \item \spxentry{receiver}
+    \subitem \spxentry{module}, \hyperpage{4}
+  \item \spxentry{Receiver}\spxextra{class in receiver}, \hyperpage{4}
+  \item \spxentry{run()}\spxextra{network\_simulator.NetworkSimulator method}, \hyperpage{3}
+
+  \indexspace
+  \bigletter S
+  \item \spxentry{send\_ack()}\spxextra{receiver.Receiver method}, \hyperpage{4}
+  \item \spxentry{send\_file()}\spxextra{sender.Sender method}, \hyperpage{5}
+  \item \spxentry{send\_packet()}\spxextra{sender.Sender method}, \hyperpage{5}
+  \item \spxentry{sender}
+    \subitem \spxentry{module}, \hyperpage{4}
+  \item \spxentry{Sender}\spxextra{class in sender}, \hyperpage{4}
+  \item \spxentry{seq\_num}\spxextra{packet.Packet attribute}, \hyperpage{3}
+  \item \spxentry{seq\_num}\spxextra{sender.Sender attribute}, \hyperpage{4}
+
+  \indexspace
+  \bigletter W
+  \item \spxentry{window}\spxextra{sender.Sender attribute}, \hyperpage{5}
+  \item \spxentry{window\_size}\spxextra{sender.Sender attribute}, \hyperpage{5}
+
+\end{sphinxtheindex}
