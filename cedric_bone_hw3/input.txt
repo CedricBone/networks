@@ -1,0 +1,46 @@
+Binary code analysis involves the examination of compiled
+executables to infer program behavior, identify vulnerabilities,
+or detect malicious intent. Traditionally, methods such as
+symbolic execution and heuristic pattern matching were used
+to understand binaries; however, these methods often suffer
+from scalability issues, lack of portability, and sensitivity
+to compiler transformations. Over the past few years, deep
+learning has been an attractive alternative because it offers
+data-driven techniques that automatically learn representations
+directly from binary data, avoiding extensive manual feature
+engineering. While deep learning has improved detection rates
+and reduced false positives, these deep learning models have
+limitations. For example, many models are treated as black
+boxes, making their decision processes difficult to interpret
+and sometimes leading to over-reliance on certain features that
+may not generalize well.
+
+This review concentrates on two main applications of deep
+learning in binary code analysis: function similarity detection
+and malware classification. Function similarity detection tries
+to assess whether two binary functions have similar behavior,
+which is important for tasks like vulnerability discovery,
+malware lineage analysis, and software forensics. Despite
+promising performance, many function similarity approaches,
+especially those that rely on graph-based neural networks, are
+computationally expensive and struggle when the code has
+been obfuscated or with architectural diversity. Malware classification uses deep neural networks to differentiate between
+benign and malicious executables. Although these methods
+have impressive detection accuracies, they are often vulnerable to adversarial attacks and sometimes depend heavily on
+specific byte-level features that don’t really capture higherlevel semantic nuances.
+As software systems become more complex and threats
+to cyberinfrastructure become more nuanced, the need for
+automatic and accurate binary analysis is more important than
+ever. Deep learning methods can capture subtle patterns and
+abstract features that traditional techniques can miss, yet they
+sometimes fall short in real-world settings due to limitations
+in training data, generalizability across different compilers
+or architectures, and inadequate evaluation against diverse
+attack vectors. The sections that follow provide a technical
+background that outlines the concepts of deep learning as
+applied to binary code analysis, including various data representations and neural network architectures. Then, it reviews
+the related work, categorizing the approaches and discussing
+both their contributions and challenges. Finally, an analysis
+of the most promising research directions shows the need for
+improved model interpretability, data quality, and resistance to
+adversarial attacks.
