@@ -1,9 +1,21 @@
+"""
+Network Simulator
+
+Implements a network simulator that can drop and corrupt packets.
+"""
 import socket
 import random
 import time
 from packet import Packet
 
 class NetworkSimulator:
+    """
+    Simulates an unreliable network channel.
+
+    Attributes:
+        loss_rate (float): Probability of packet loss
+        corruption_rate (float): Probability of packet corruption
+    """
     def __init__(self, sender_port=11111, receiver_port=22222, loss_rate=0.3, corruption_rate=0.3):
         self.loss_rate = loss_rate
         self.corruption_rate = corruption_rate
@@ -12,10 +24,13 @@ class NetworkSimulator:
         self.sender_port = sender_port
         self.receiver_port = receiver_port
         
-        print(f"Network simulator started")
-        
     def run(self):
-        print("Waiting for packets...")
+        """
+        Main sim loop.
+
+        Receives packets and randomly drops or corrupts them before forwarding.
+        """
+        print("Waiting...")
 
         while True:
             recv_num = 4096
@@ -55,6 +70,7 @@ class NetworkSimulator:
                 dest_port = self.receiver_port
             else:
                 dest_port = self.sender_port
+            # sends packet to destination in bytes
             self.socket.sendto(str(packet.__dict__).encode(), ('localhost', dest_port))
    
 if __name__ == "__main__":

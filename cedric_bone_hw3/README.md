@@ -18,11 +18,11 @@ python network_simulator.py
 ### 2. Receive Mode
 
 ```bash
-python main.py receive output_file.txt
+python main.py receive output.txt
 ```
 
 ### 3. Send Mode
 
 ```bash
-python main.py send input_file.txt
+python main.py send input.txt
 ```

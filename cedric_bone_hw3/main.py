@@ -4,6 +4,9 @@ from sender import Sender
 from receiver import Receiver
 
 def main():
+    """
+    Main function
+    """
     parser = argparse.ArgumentParser(description='transfer protocol')
     parser.add_argument('mode', choices=['send', 'receive'])
     parser.add_argument('file')

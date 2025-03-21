@@ -1,7 +1,15 @@
+"""
+Receiver
+
+Implements the receiver side of the reliable data transfer protocol.
+"""
 import socket
 from packet import Packet
 
 class Receiver:
+    """
+    A receiver that receives packets and reassembles
+    """
     def __init__(self, port=22222, window_size=4):
         self.expected_seq = 0
         self.window_size = window_size
@@ -12,11 +20,21 @@ class Receiver:
         self.received_data = []
         
     def send_ack(self, ack_num, addr):
+        """
+        Send an ACK
+
+        Args:
+            ack_num (int): ACK number
+            addr (tuple): Address of sender
+        """
         ack_packet = Packet(seq_num=None, data="", ack_num=ack_num)
         self.socket.sendto(str(ack_packet.__dict__).encode(), addr)
         print(f"Sent ACK {ack_num}")
         
     def receive_file(self):
+        """
+        Receive file from sender
+        """
         print("Waiting for data...")
         while True:
             data, addr = self.socket.recvfrom(4096)

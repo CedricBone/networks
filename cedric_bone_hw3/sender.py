@@ -1,8 +1,22 @@
+"""
+Sender
+
+Implements the sender side of the reliable data transfer protocol.
+"""
 import socket
 import time
 from packet import Packet
 
 class Sender:
+    """
+    Implements a sliding window retransmission.
+
+    Attributes:
+        seq_num (int): Current sequence number
+        window_size (int): Size of the sliding window
+        window (dict): Buffer
+        base (int): Sequence number of the oldest unacknowledged packet
+    """
     def __init__(self, port=11111, window_size=4):
         self.seq_num = 0
         self.window_size = window_size
@@ -15,10 +29,24 @@ class Sender:
         self.socket.settimeout(1.0) 
         
     def send_packet(self, packet, addr):
+        """
+        Send a packet to address
+
+        Args:
+            packet (Packet): Packet to send
+            addr (tuple): Destination address (host, port)
+        """
         self.socket.sendto(str(packet.__dict__).encode(), addr)
         print(f"Sent packet {packet.seq_num}")
         
     def send_file(self, data, receiver_addr=('localhost', 33333)):
+        """
+        Send a file to address
+
+        Args:
+            data (str): Data to send
+            receiver_addr (tuple): Destination address (host, port)
+        """
         # 4 bytes = 32 bits per packet
         size = 4 
         chunks = []
