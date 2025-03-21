@@ -5,7 +5,8 @@ class Receiver:
     def __init__(self, port=12348, window_size=4):
         self.expected_seq = 0
         self.window_size = window_size
-        self.buffer = {}  # Buffer for out-of-order packets
+        # Buffer for out-of-order packets
+        self.buffer = {}  
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.socket.bind(('localhost', port))
         self.received_data = []
@@ -24,32 +25,31 @@ class Receiver:
             
             print(f"Received packet {packet.seq_num}")
             
-            # Check packet integrity using checksum
+            # packet integrity 
             if not (packet.checksum == packet.calculate_checksum()):
                 print(f"Packet {packet.seq_num} corrupted")
                 self.send_ack(self.expected_seq - 1, addr)
                 continue
                 
-            # Check if this is the end marker
+            # Check if end
             if packet.data == "END":
                 self.send_ack(packet.seq_num, addr)
                 break
             
-            # Check if packet is in order
+            # Check order
             if packet.seq_num == self.expected_seq:
                 self.received_data.append(packet.data)
                 self.expected_seq += 1
                 
-                # Process any buffered packets
+                # Process buffered packets
                 while self.expected_seq in self.buffer:
                     self.received_data.append(self.buffer.pop(self.expected_seq))
                     self.expected_seq += 1
                     
             elif packet.seq_num > self.expected_seq:
-                # Future packet, buffer it
                 self.buffer[packet.seq_num] = packet.data
             
-            # Send ACK for highest in-order packet received
+            # Send ACK 
             self.send_ack(self.expected_seq - 1, addr)
                 
         return ''.join(self.received_data)
