@@ -1,0 +1,497 @@
+# Client for P2P file sharing
+import socket
+import json
+import os
+import random
+import peer
+import metainfo as M
+import hashlib
+import time
+import traceback
+
+chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
+
+class Client:
+    
+    def __init__(self, download_dir="downloads"):
+        # download directory
+        self.download_dir = download_dir
+        os.makedirs(download_dir, exist_ok=True)
+
+        # random peer_id
+        peerid = ""
+        for char in range(20):
+            randindex = random.randint(0, 35)
+            peerid += chars[randindex]
+        self.peer_id = peerid
+        
+        # peer
+        self.peer = peer.Peer()
+        self.peer.start()
+        # trackers
+        self.trackers = set()
+        # torrents
+        self.torrents = {}  # info_hash -> metainfo
+    
+    def register_with_tracker(self, tracker_url, info_hash, files=[]):
+        # tracker URL
+        host, port = tracker_url.split(':')
+        port = int(port)
+        
+        try:
+            # Connect to tracker
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.settimeout(10)  # Set timeout for operations
+            s.connect((host, port))
+
+            # Register with tracker
+            request = {
+                'type': 'announce',
+                'peer_id': self.peer_id, 
+                'info_hash': info_hash,
+                'port': self.peer.port,
+                'files': files  # List of files being shared
+            }
+            s.sendall(json.dumps(request).encode())
+
+            # Check response
+            response_data = s.recv(4096).decode()
+            if not response_data:
+                print(f"Error: No response from tracker at {tracker_url}")
+                return False
+                
+            response = json.loads(response_data)
+            return response.get('status') == 'ok'
+        except (socket.timeout, ConnectionRefusedError) as e:
+            print(f"Error connecting to tracker at {tracker_url}: {e}")
+            return False
+        except Exception as e:
+            print(f"Unexpected error registering with tracker at {tracker_url}: {e}")
+            return False
+        finally:
+            try:
+                s.close()
+            except Exception:
+                pass  # Ignore errors closing socket
+                
+    
+    def get_peers_from_tracker(self, tracker_url, info_hash):
+        """Requests a list of peers for a given info_hash from the tracker."""
+        try:
+            tracker_host, tracker_port = tracker_url.split(':')
+            tracker_port = int(tracker_port)
+            
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.connect((tracker_host, tracker_port))
+                request = {
+                    'type': 'get_peers',
+                    'info_hash': info_hash,
+                    'peer_id': self.peer_id
+                }
+                s.sendall(json.dumps(request).encode())
+                
+                response_data = s.recv(4096).decode()
+                response = json.loads(response_data)
+                
+                peer_list = [] # Initialize empty list
+                if 'peers' in response and isinstance(response['peers'], list):
+                    # Extract ip and port, create tuples
+                    raw_peers = response['peers'] # List of peer dictionaries
+                    peer_list = [(p.get('ip'), p.get('port')) 
+                                 for p in raw_peers 
+                                 if p.get('ip') and p.get('port') is not None]
+                    
+                    # Filter out self using the peer's listening address
+                    # Use socket.gethostbyname('localhost') if needed, but assuming self.peer.host is comparable
+                    self_addr = (self.peer.host, self.peer.port)
+                    peer_list = [p for p in peer_list if p != self_addr]
+                
+                else:
+                    print(f"Tracker response did not contain a valid 'peers' list: {response}")
+                
+                return peer_list # Return list of (ip, port) tuples
+
+        except Exception as e:
+            print(f"Could not get peers from tracker {tracker_url}: {e}")
+            return []
+
+    def open_torrent(self, torrent_path):
+        # Load 
+        metainfo = M.load_metainfo(torrent_path)
+        info_hash = metainfo['info_hash']
+        
+        # Store 
+        self.torrents[info_hash] = metainfo
+        tracker_url = metainfo['announce']
+        self.register_with_tracker(tracker_url, info_hash)
+        
+        # Get peers
+        peers = self.get_peers_from_tracker(tracker_url, info_hash)
+        # Connect peers
+        count = 0
+        for peer in peers:
+            if self.peer.connect_to_peer(peer['ip'], peer['port']):
+                count += 1
+        
+        return metainfo
+    
+    def download_from_torrent(self, torrent_path, output_dir="."):
+        metainfo = None
+        output_path = None
+        output_file = None
+        download_successful = False # Flag for cleanup logic
+        num_pieces = 0
+        downloaded_pieces = {}
+        peer_pool = []
+        filename = "unknown_file"
+        
+        try: # Outer try for overall process and cleanup
+            try: # --- Setup Phase --- 
+                metainfo = M.load_metainfo(torrent_path)
+                if not metainfo:
+                    print(f"Error: Could not load torrent file {torrent_path}")
+                    return
+
+                # Safely extract necessary info using .get()
+                info_dict = metainfo.get('info')
+                if not isinstance(info_dict, dict):
+                    print("Error: Invalid torrent file - missing or invalid 'info' dictionary.")
+                    return
+                
+                filename = info_dict.get('name', 'unknown_file') # Default filename if missing
+                file_length = info_dict.get('length')
+                piece_length = info_dict.get('piece length')
+                pieces_hashes_concat = info_dict.get('pieces') # bytes or None
+                tracker_url = metainfo.get('announce')
+                info_hash = metainfo.get('info_hash') # str
+                expected_file_hash = metainfo.get('file_hash') # str
+
+                # Basic validation (more can be added later)
+                if not all([filename != 'unknown_file', isinstance(file_length, int), isinstance(piece_length, int), tracker_url, info_hash, expected_file_hash]):
+                    print("Error: Torrent file is missing essential information.")
+                    # Log which fields are missing/invalid if needed
+                    return
+
+                num_pieces = (file_length + piece_length - 1) // piece_length
+                output_path = os.path.join(output_dir, filename)
+                
+                print(f"Starting download for: {filename} ({file_length} bytes, {num_pieces} pieces)")
+
+                # Get peers
+                peer_pool = self.get_peers_from_tracker(tracker_url, info_hash)
+                if not peer_pool:
+                    print("No peers found for this torrent.")
+                    return
+                print(f"Found {len(peer_pool)} potential peers: {peer_pool}")
+
+                # Prepare output file
+                # Create directory if it doesn't exist
+                os.makedirs(output_dir, exist_ok=True) 
+                # Open file in binary write mode, pre-allocate space? No, seek/write is better.
+                output_file = open(output_path, 'wb') 
+                # No need to preallocate if writing pieces directly to correct locations
+
+            except Exception as setup_e:
+                print(f"\n--- Error during download setup phase ---")
+                traceback.print_exc() # Print full traceback for setup errors
+                print(f"-----------------------------------------")
+                return # Exit if setup fails
+            
+            # --- Download Loop ---            
+            try:
+                downloaded_pieces = {} # piece_index -> piece_data
+                total_bytes_downloaded = 0
+                all_pieces_present = False
+
+                # Get piece hashes from metainfo - we're now using string format
+                piece_hashes = info_dict.get('piece_hashes', [])
+                
+                # Fall back to concatenated binary (now stored as hex string) if needed
+                if not piece_hashes and 'pieces_binary' in info_dict:
+                    try:
+                        binary_hex = info_dict['pieces_binary']
+                        # Convert back to binary first
+                        binary_data = bytes.fromhex(binary_hex)
+                        # Then split into 20-byte chunks and convert each to hex
+                        piece_hashes = [binary_data[i:i+20].hex() for i in range(0, len(binary_data), 20)]
+                        print(f"Converted {len(piece_hashes)} binary hashes to hex format")
+                    except Exception as e:
+                        print(f"Warning: Could not process binary piece hashes: {e}")
+                        piece_hashes = []
+                
+                if not piece_hashes:
+                    print("Warning: No piece hashes found in torrent file. Piece verification skipped.")
+
+                # Simple piece selection: just iterate through needed pieces
+                pieces_needed = list(range(num_pieces))
+                random.shuffle(pieces_needed) # Download in random order
+                
+                peer_index = 0 # Simple round-robin peer selection
+
+                while pieces_needed:
+                    piece_index = pieces_needed[0] # Try to get the next needed piece
+                    attempts = 0
+                    max_attempts_per_piece = len(peer_pool) * 2 # Try each peer twice per piece
+                    piece_downloaded = False
+                    
+                    while attempts < max_attempts_per_piece and not piece_downloaded:
+                        if not peer_pool: # Check if peer_pool became empty
+                            print("Error: No more peers available to try.")
+                            break # Exit inner attempt loop
+                        
+                        current_peer_index = peer_index % len(peer_pool)
+                        peer_host, peer_port = peer_pool[current_peer_index] 
+                        peer_index += 1 # Move to next peer for next attempt/piece
+                        attempts += 1
+                        
+                        print(f"Requesting piece {piece_index}/{num_pieces-1} from {peer_host}:{peer_port} (Attempt {attempts})...", end=' ')
+
+                        try:
+                            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as piece_s:
+                                piece_s.settimeout(10) # Timeout for connection and receiving
+                                piece_s.connect((peer_host, peer_port))
+                                request = {
+                                    'type': 'request_piece',
+                                    'filename': filename, # Need filename to identify on peer side
+                                    'piece_index': piece_index,
+                                    'piece_size': piece_length, # Send expected size for context
+                                    'file_size': file_length   # Send total file size for context
+                                }
+                                piece_s.sendall(json.dumps(request).encode())
+
+                                # Determine expected size for this specific piece
+                                expected_piece_size = piece_length
+                                if piece_index == num_pieces - 1: # Last piece might be smaller
+                                    expected_piece_size = file_length - (piece_index * piece_length)
+                                
+                                # Receive the piece data
+                                piece_data = b''
+                                error_response = None
+                                
+                                # First check if we're getting an error response (JSON)
+                                try:
+                                    first_chunk = piece_s.recv(4096)
+                                    if not first_chunk:
+                                        print(f"Error: Peer {peer_host}:{peer_port} disconnected prematurely.")
+                                        continue # Try next peer
+                                        
+                                    # Try to parse as JSON error first
+                                    try:
+                                        error_response = json.loads(first_chunk.decode())
+                                        if 'error' in error_response or 'status' in error_response and error_response.get('status') == 'error':
+                                            error_msg = error_response.get('error') or error_response.get('message')
+                                            print(f"Failed (Peer reported error: {error_msg})")
+                                            continue # Try next peer
+                                    except json.JSONDecodeError:
+                                        # Not JSON, must be binary data (piece)
+                                        piece_data = first_chunk
+                                        
+                                    # Continue receiving rest of the piece if needed
+                                    while len(piece_data) < expected_piece_size:
+                                        chunk = piece_s.recv(min(4096, expected_piece_size - len(piece_data)))
+                                        if not chunk:
+                                            print(f"Error: Peer {peer_host}:{peer_port} disconnected prematurely.")
+                                            break # Break receiving loop
+                                        piece_data += chunk
+                                    
+                                    if len(piece_data) != expected_piece_size:
+                                        print(f"Failed (Incomplete data received: {len(piece_data)}/{expected_piece_size} bytes).")
+                                        continue # Try next peer
+                                except socket.timeout:
+                                    print(f"Failed (Timeout receiving data from {peer_host}:{peer_port}).")
+                                    continue # Try next peer
+
+                                # --- Piece Verification (Optional) ---
+                                piece_valid = True
+                                if piece_hashes and piece_index < len(piece_hashes):
+                                    expected_piece_hash = piece_hashes[piece_index]
+                                    
+                                    # Calculate piece hash
+                                    actual_piece_hash_obj = hashlib.sha1()
+                                    actual_piece_hash_obj.update(piece_data)
+                                    actual_hexdigest = actual_piece_hash_obj.hexdigest()
+                                    
+                                    # Compare hex strings directly
+                                    if actual_hexdigest == expected_piece_hash:
+                                        print(f"Piece {piece_index} hash verified successfully.")
+                                    else:
+                                        print(f"Failed (Piece {piece_index} hash mismatch!). Retrying...")
+                                        piece_valid = False
+                                else:
+                                    print("Note: No hash verification performed for this piece.")
+                                    # No hashes provided or index out of bounds
+                                
+                                if piece_valid:
+                                    print(f"Success ({len(piece_data)} bytes).")
+                                    # Write piece to file at correct offset
+                                    offset = piece_index * piece_length
+                                    output_file.seek(offset)
+                                    output_file.write(piece_data)
+                                    total_bytes_downloaded += len(piece_data)
+                                    # Record piece as downloaded (can store data or just True)
+                                    downloaded_pieces[piece_index] = True 
+                                    pieces_needed.pop(0) # Remove from needed list
+                                    piece_downloaded = True # Exit attempt loop for this piece
+                                else:
+                                    # Piece failed verification, loop continues to try next peer/attempt
+                                    pass 
+                                    
+                        except socket.timeout:
+                            print(f"Failed (Timeout connecting to {peer_host}:{peer_port}).")
+                            # Optionally remove peer from pool after timeout?
+                        except ConnectionRefusedError:
+                            print(f"Failed (Connection refused by {peer_host}:{peer_port}).")
+                            # Optionally remove peer from pool
+                        except Exception as piece_e:
+                            print(f"Failed (Error communicating with {peer_host}:{peer_port}: {piece_e})")
+                            # Consider logging traceback here too if needed
+                            # traceback.print_exc()
+
+                    # End of attempts loop for one piece
+                    if not piece_downloaded:
+                        print(f"Error: Failed to download piece {piece_index} after {max_attempts_per_piece} attempts.")
+                        break # Exit the main while pieces_needed loop
+                
+                # Check if all pieces were downloaded
+                if not pieces_needed:
+                    all_pieces_present = True
+                    # All pieces downloaded, do final verification
+                        else:
+                            print(f"Failed (Piece {piece_index} hash mismatch!). Retrying...")
+                            piece_valid = False
+                    else:
+                        print("Note: No hash verification performed for this piece.")
+                        # No hashes provided or index out of bounds
+                else:
+                    print(f"Download incomplete. Missing {len(pieces_needed)} pieces.")
+                    download_successful = False 
+
+
+                                    # --- Piece Verification (Optional) ---
+                                    piece_valid = True
+                                    if piece_hashes and piece_index < len(piece_hashes):
+                                        expected_piece_hash = piece_hashes[piece_index]
+                                        
+                                        # Calculate piece hash
+                                        actual_piece_hash_obj = hashlib.sha1()
+                                        actual_piece_hash_obj.update(piece_data)
+                                        actual_hexdigest = actual_piece_hash_obj.hexdigest()
+                                        
+                                        # Compare hex strings directly
+                                        if actual_hexdigest == expected_piece_hash:
+                                            print(f"Piece {piece_index} hash verified successfully.")
+                                        else:
+                                            print(f"Failed (Piece {piece_index} hash mismatch!). Retrying...")
+                                            piece_valid = False
+                                    else:
+                                        print("Note: No hash verification performed for this piece.")
+                                        # No hashes provided or index out of bounds
+                    
+                    if piece_valid:
+                        print(f"Success ({len(piece_data)} bytes).")
+                        # Write piece to file at correct offset
+                        offset = piece_index * piece_length
+                        output_file.seek(offset)
+                        output_file.write(piece_data)
+                        total_bytes_downloaded += len(piece_data)
+                        # Record piece as downloaded (can store data or just True)
+                        downloaded_pieces[piece_index] = True 
+                        pieces_needed.pop(0) # Remove from needed list
+                        piece_downloaded = True # Exit attempt loop for this piece
+                    else:
+                        # Piece failed verification, loop continues to try next peer/attempt
+                        pass 
+                        
+            except socket.timeout:
+                print(f"Failed (Timeout connecting to {peer_host}:{peer_port}).")
+                # Optionally remove peer from pool after timeout?
+            except ConnectionRefusedError:
+                print(f"Failed (Connection refused by {peer_host}:{peer_port}).")
+                # Optionally remove peer from pool
+            except Exception as piece_e:
+                print(f"Failed (Error communicating with {peer_host}:{peer_port}: {piece_e})")
+                # Consider logging traceback here too if needed
+                # traceback.print_exc()
+
+        finally:
+            # --- Cleanup --- 
+            if output_file: # If file is still open (e.g., due to error before close)
+                try:
+                    output_file.close()
+                except Exception as close_e:
+                    print(f"Error closing output file handle: {close_e}")
+
+            if not download_successful and output_path and os.path.exists(output_path):
+                print(f"Cleaned up partially downloaded file: {output_path}")
+                try:
+                    os.remove(output_path)
+                except Exception as remove_e:
+                    print(f"Error removing partial file: {remove_e}")
+            elif download_successful:
+                print(f"Download complete: {output_path}")
+            else: # Failed before even creating the file
+                print("Download failed.")
+
+    def create_torrent(self, filepath, tracker_url, output_path=None):
+        # Generate metainfo
+        metainfo = M.create_metainfo(filepath, tracker_url)
+        
+        # Set default output path if not provided
+        if not output_path:
+            output_path = os.path.basename(filepath) + '.torrent'
+        
+        # Save to file
+        M.save_metainfo(metainfo, output_path)
+        
+        # Share the file
+        self.peer.share_file(filepath)
+        
+        # Register with tracker
+        info_hash = metainfo['info_hash']
+        self.register_with_tracker(tracker_url, info_hash, [os.path.basename(filepath)])
+        
+        return output_path
+    
+    def share_file(self, filepath, tracker_url):
+        # First, share the file with the peer which will create a stable copy
+        if not self.peer.share_file(filepath):
+            print(f"Failed to share file {filepath}")
+            return False
+            
+        # Get the path to the stable copy that was created
+        shared_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'shared')
+        stable_filepath = os.path.join(shared_dir, os.path.basename(filepath))
+        
+        # Now create metainfo using the stable copy instead of the original file
+        metainfo = M.create_metainfo(stable_filepath, tracker_url)
+        if not metainfo:
+            print(f"Failed to create torrent file for {filepath}")
+            return False
+        
+        filename = os.path.basename(filepath)
+        # Save metainfo file
+        torrent_path = f"{filename}.torrent"
+        M.save_metainfo(metainfo, torrent_path)
+        
+        # Register with tracker
+        info_hash = metainfo['info_hash']
+        if self.register_with_tracker(tracker_url, info_hash, [filename]):
+            print(f"File shared and torrent created: {torrent_path}")
+            return True
+        else:
+            print(f"Failed to register with tracker: {tracker_url}")
+            return False
+            
+    def calculate_file_hash(self, filepath, hash_algo='sha256'):
+        """Calculates the hash of a given file."""
+        h = hashlib.new(hash_algo)
+        with open(filepath, 'rb') as f:
+            while True:
+                chunk = f.read(4096)
+                if not chunk:
+                    break
+                h.update(chunk)
+        return h.hexdigest()
+
+    def stop(self):
+        self.peer.stop()
