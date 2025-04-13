@@ -40,7 +40,7 @@ Follow these steps to manually test the P2P file sharing functionality:
 ### 1. Start a Tracker (Terminal 1)
 
 ```bash
-python main.py
+python src/main.py
 ```
 
 ```
@@ -53,7 +53,7 @@ You should see a confirmation that the tracker is running.
 
 ```bash
 echo "This is a test file for sharing" > test_file.txt
-python main.py
+python src/main.py
 ```
 
 ```
@@ -66,7 +66,7 @@ share test_file.txt localhost:8000
 ### 3. Download the File (Terminal 3)
 
 ```bash
-python main.py
+python src/main.py
 ```
 
 ```
@@ -81,3 +81,18 @@ The content should be identical, confirming successful P2P file transfer.
 - Check that the file paths are correct
 - Check that the port is not already used
 - Restart the clients 
+
+## Comparison to Standard BitTorrent
+
+This project implements a custom peer-to-peer file sharing protocol inspired by BitTorrent but **does not strictly follow the official BitTorrent specification**. It utilizes similar concepts like a tracker, peers, and `.torrent` metainfo files, but deviates in several key ways:
+
+*   **Encoding:** Uses standard **JSON** for all network communication (tracker and peer messages) and for the `.torrent` file format, instead of BitTorrent's **Bencoding**.
+*   **Protocols:** 
+    *   Uses a custom **TCP-based protocol with JSON messages** for both tracker and peer communication.
+    *   Standard BitTorrent uses HTTP GET requests (with Bencoded responses) for tracker communication and a specific binary peer wire protocol (with messages like `choke`, `have`, `request`, `piece`).
+*   **File Transfer:** This is the most significant simplification. This project uses **direct whole-file transfers** between peers. A client requests the entire file, and the serving peer sends the entire file content back. 
+    *   Standard BitTorrent breaks files into **pieces**, which are requested, transferred, and verified individually using SHA1 hashes. This allows downloading from multiple peers simultaneously and ensures piece integrity during transfer.
+*   **Metainfo (`.torrent`) File:** While structurally similar (using `announce` and `info` keys), the format is JSON, uses different hashing (SHA256 likely), and lacks the standard `pieces` (concatenated SHA1 hashes) field used for piece-by-piece verification during download.
+*   **Peer Messages & Logic:** Lacks standard BitTorrent peer messages (`choke`, `unchoke`, `interested`, `not interested`, `have`, `bitfield`, `request`, `piece`, `cancel`) and associated logic like choking algorithms (tit-for-tat, optimistic unchoking).
+
+In essence, this project provides a functional P2P file sharing system using a simplified, custom approach, rather than being a BitTorrent-compatible client.

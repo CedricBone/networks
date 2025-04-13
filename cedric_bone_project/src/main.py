@@ -2,9 +2,9 @@
 import os
 import sys
 import argparse
-from src.client import Client
-from src.tracker import Tracker
-from src.metainfo import create_metainfo, save_metainfo
+import client as C
+import tracker as T
+import metainfo as M 
 
 
 def print_help():
@@ -34,7 +34,7 @@ def main():
     
     # Check if we should start as a tracker
     if args.tracker:
-        tracker = Tracker(args.host, args.port or 8000)
+        tracker = T.Tracker(args.host, args.port or 8000)
         tracker.start()
         print(f"Tracker running at {tracker.host}:{tracker.port}")
         
@@ -47,7 +47,7 @@ def main():
         return
     
     # Create client
-    client = Client()
+    client = C.Client()
     
     print(f"\nP2P client started on port {client.peer.port}")
     print_help()
@@ -70,7 +70,7 @@ def main():
                     if len(command) > 1:
                         tracker_port = int(command[1])
                     
-                    tracker = Tracker(args.host, tracker_port)
+                    tracker = T.Tracker(args.host, tracker_port)
                     tracker.start()
                     print(f"Tracker started on {args.host}:{tracker_port}")
                 
@@ -87,8 +87,8 @@ def main():
                         continue
                     
                     output_path = file_path + ".torrent"
-                    metainfo = create_metainfo(file_path, tracker_url)
-                    save_metainfo(metainfo, output_path)
+                    metainfo = M.create_metainfo(file_path, tracker_url)
+                    M.save_metainfo(metainfo, output_path)
                     print(f"Created torrent file: {output_path}")
                 
                 elif command[0] == "share":
