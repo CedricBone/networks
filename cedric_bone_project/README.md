@@ -93,12 +93,12 @@ You can test the basic functionality by running two instances (peers) of the app
 
 4.  **Search for the File:** In Peer 2's terminal, search for the sample file:
     ```
-    > search sample.txt
+    > search Frankenstein.txt
     ```
     You should see output similar to:
     ```
     Search results:
-      [0] sample.txt (X bytes) - 127.0.0.1:PORT1 
+      [0] Frankenstein.txt (X bytes) - 127.0.0.1:PORT1 
     ```
     Note the index number (e.g., `[0]`).
 
@@ -202,10 +202,12 @@ This application successfully meets all the technical requirements outlined for 
 
 ## References
 
--   **socket:** [https://docs.python.org/3/library/socket.html](https://docs.python.org/3/library/socket.html)
--   **json:** [https://docs.python.org/3/library/json.html](https://docs.python.org/3/library/json.html)
--   **hashlib:** [https://docs.python.org/3/library/hashlib.html](https://docs.python.org/3/library/hashlib.html)
--   **threading:** [https://docs.python.org/3/library/threading.html](https://docs.python.org/3/library/threading.html)
--   **os:** [https://docs.python.org/3/library/os.html](https://docs.python.org/3/library/os.html)
--   **time:** [https://docs.python.org/3/library/time.html](https://docs.python.org/3/library/time.html)
--   **argparse:** [https://docs.python.org/3/library/argparse.html](https://docs.python.org/3/library/argparse.html)
+-   [Python `socket` — Low-level networking interface](https://docs.python.org/3/library/socket.html)
+-   [Python `json` — JSON encoder and decoder](https://docs.python.org/3/library/json.html)
+-   [Python `hashlib` — Secure hashes and message digests](https://docs.python.org/3/library/hashlib.html)
+-   [Python `threading` — Thread-based parallelism](https://docs.python.org/3/library/threading.html)
+-   [Python `os` — Miscellaneous operating system interfaces](https://docs.python.org/3/library/os.html)
+-   [Python `time` — Time access and conversions](https://docs.python.org/3/library/time.html)
+-   [Python `argparse` — Parser for command-line options, arguments and sub-commands](https://docs.python.org/3/library/argparse.html)
+-   [Python `input()` — Read a string from standard input](https://docs.python.org/3/library/functions.html#input)
+-   [Python `cmd` — Support for line-oriented command interpreters](https://docs.python.org/3/library/cmd.html)

@@ -1,0 +1,91 @@
+\begin{sphinxtheindex}
+\let\bigletter\sphinxstyleindexlettergroup
+\let\spxpagem \sphinxstyleindexpagemain
+\let\spxentry \sphinxstyleindexentry
+\let\spxextra \sphinxstyleindexextra
+
+  \bigletter A
+  \item \spxentry{add\_peer()}\spxextra{node.P2PNode method}, \hyperpage{4}
+
+  \indexspace
+  \bigletter C
+  \item \spxentry{cli}
+    \subitem \spxentry{module}, \hyperpage{3}
+  \item \spxentry{CommandLine}\spxextra{class in cli}, \hyperpage{3}
+  \item \spxentry{connect()}\spxextra{cli.CommandLine method}, \hyperpage{3}
+
+  \indexspace
+  \bigletter D
+  \item \spxentry{download()}\spxextra{cli.CommandLine method}, \hyperpage{3}
+  \item \spxentry{download\_chunk()}\spxextra{node.P2PNode method}, \hyperpage{4}
+  \item \spxentry{download\_file()}\spxextra{node.P2PNode method}, \hyperpage{4}
+  \item \spxentry{download\_thread()}\spxextra{cli.CommandLine method}, \hyperpage{3}
+
+  \indexspace
+  \bigletter F
+  \item \spxentry{find\_free\_port()}\spxextra{in module utils}, \hyperpage{5}
+
+  \indexspace
+  \bigletter G
+  \item \spxentry{get\_file\_info()}\spxextra{node.P2PNode method}, \hyperpage{4}
+  \item \spxentry{get\_files()}\spxextra{node.P2PNode method}, \hyperpage{4}
+  \item \spxentry{get\_peers()}\spxextra{node.P2PNode method}, \hyperpage{4}
+
+  \indexspace
+  \bigletter H
+  \item \spxentry{handle\_chunk\_request()}\spxextra{node.P2PNode method}, \hyperpage{4}
+  \item \spxentry{handle\_client()}\spxextra{node.P2PNode method}, \hyperpage{4}
+  \item \spxentry{handle\_info\_request()}\spxextra{node.P2PNode method}, \hyperpage{4}
+  \item \spxentry{handle\_list\_request()}\spxextra{node.P2PNode method}, \hyperpage{4}
+
+  \indexspace
+  \bigletter I
+  \item \spxentry{index\_files()}\spxextra{node.P2PNode method}, \hyperpage{4}
+
+  \indexspace
+  \bigletter L
+  \item \spxentry{list()}\spxextra{cli.CommandLine method}, \hyperpage{3}
+
+  \indexspace
+  \bigletter M
+  \item \spxentry{main}
+    \subitem \spxentry{module}, \hyperpage{3}
+  \item \spxentry{main()}\spxextra{in module main}, \hyperpage{3}
+  \item \spxentry{maintenance()}\spxextra{node.P2PNode method}, \hyperpage{4}
+  \item \spxentry{module}
+    \subitem \spxentry{cli}, \hyperpage{3}
+    \subitem \spxentry{main}, \hyperpage{3}
+    \subitem \spxentry{node}, \hyperpage{3}
+    \subitem \spxentry{utils}, \hyperpage{5}
+
+  \indexspace
+  \bigletter N
+  \item \spxentry{node}
+    \subitem \spxentry{module}, \hyperpage{3}
+
+  \indexspace
+  \bigletter P
+  \item \spxentry{P2PNode}\spxextra{class in node}, \hyperpage{3}
+  \item \spxentry{peers()}\spxextra{cli.CommandLine method}, \hyperpage{3}
+
+  \indexspace
+  \bigletter R
+  \item \spxentry{remove\_peer()}\spxextra{node.P2PNode method}, \hyperpage{4}
+  \item \spxentry{request\_file\_info()}\spxextra{node.P2PNode method}, \hyperpage{4}
+  \item \spxentry{request\_file\_list()}\spxextra{node.P2PNode method}, \hyperpage{4}
+  \item \spxentry{run\_server()}\spxextra{node.P2PNode method}, \hyperpage{4}
+
+  \indexspace
+  \bigletter S
+  \item \spxentry{search()}\spxextra{cli.CommandLine method}, \hyperpage{3}
+  \item \spxentry{search\_files()}\spxextra{node.P2PNode method}, \hyperpage{4}
+  \item \spxentry{start()}\spxextra{cli.CommandLine method}, \hyperpage{3}
+  \item \spxentry{start()}\spxextra{node.P2PNode method}, \hyperpage{4}
+  \item \spxentry{stop()}\spxextra{node.P2PNode method}, \hyperpage{4}
+
+  \indexspace
+  \bigletter U
+  \item \spxentry{utils}
+    \subitem \spxentry{module}, \hyperpage{5}
+
+\end{sphinxtheindex}

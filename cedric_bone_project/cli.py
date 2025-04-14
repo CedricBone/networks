@@ -6,19 +6,16 @@ import threading
 import utils
 
 class CommandLine:
-    """Simple command-line interface for the P2P application"""
+    """Command-line interface"""
     
     def __init__(self, node):
         self.node = node
         self.commands = {
-            'help': (self.cmd_help, 'Show available commands'),
-            'search': (self.cmd_search, 'Search for files (usage: search <query>)'),
-            'list': (self.cmd_list, 'List local files'),
-            'peers': (self.cmd_peers, 'List connected peers'),
-            'connect': (self.cmd_connect, 'Connect to a peer (usage: connect <ip> <port>)'),
-            'disconnect': (self.cmd_disconnect, 'Disconnect from a peer (usage: disconnect <ip> <port>)'),
-            'download': (self.cmd_download, 'Download a file (usage: download <result_index>)'),
-            'quit': (self.cmd_quit, 'Exit the application')
+            'search': (self.search, 'Search for files (usage: search <query>)'),
+            'list': (self.list, 'List local files'),
+            'peers': (self.peers, 'List connected peers'),
+            'connect': (self.connect, 'Connect to a peer (usage: connect <ip> <port>)'),
+            'download': (self.download, 'Download a file (usage: download <result_index>)'),
         }
         self.search_results = []
     
@@ -26,9 +23,11 @@ class CommandLine:
         """Start the CLI"""
         print("\nP2P File Sharing Application")
         print("============================")
-        print("Type 'help' for available commands")
         print("Use 'connect' to connect to other peers")
-        
+        print("Use 'search' to search for files")
+        print("Use 'list' to list local files")
+        print("Use 'peers' to list connected peers")
+        print("Use 'download' to download a file")
         self.node.start()
         
         try:
@@ -46,137 +45,84 @@ class CommandLine:
                         self.commands[cmd][0](args)
                     else:
                         print(f"Unknown command: {cmd}")
-                        print("Type 'help' for available commands")
                 except EOFError:
                     break
         except KeyboardInterrupt:
             print("\nExiting...")
         finally:
             self.node.stop()
+
     
-    def cmd_help(self, args):
-        """Show help"""
-        print("\nAvailable commands:")
-        for cmd, (_, desc) in self.commands.items():
-            print(f"  {cmd:<10} - {desc}")
-    
-    def cmd_search(self, args):
+    def search(self, args):
         """Search for files"""
-        if not args:
-            print("Usage: search <query>")
-            return
-        
+
+        # build query
         query = ' '.join(args)
+
+        # search
         print(f"Searching for '{query}'...")
         self.search_results = self.node.search_files(query)
-        
-        if not self.search_results:
-            print("No results found")
-            return
-        
+
+        # print results
         print("\nSearch results:")
         for i, result in enumerate(self.search_results):
-            peer_str = "Local" if result['peer'] == 'local' else f"{result['peer'][0]}:{result['peer'][1]}"
+            if result['peer'] == 'local':
+                peer_str = 'Local'
+            else:   
+                peer_str = f"{result['peer'][0]}:{result['peer'][1]}"
             size_str = result['size']
+
             print(f"  [{i}] {result['filename']} ({size_str}) - {peer_str}")
     
-    def cmd_list(self, args):
+    def list(self, args):
         """List local files"""
         files = self.node.get_files()
-        
-        if not files:
-            print("No local files")
-            return
-        
         print("\nLocal files:")
         for filename in files:
             size_str = self.node.files[filename]['size']
             print(f"  {filename} ({size_str})")
     
-    def cmd_peers(self, args):
+    def peers(self, args):
         """List peers"""
         peers = self.node.get_peers()
-        
-        if not peers:
-            print("No peers connected")
-            return
-        
         print("\nConnected peers:")
         for i, peer in enumerate(peers):
             print(f"  [{i}] {peer[0]}:{peer[1]}")
     
-    def cmd_connect(self, args):
-        """Connect to a peer"""
-        if len(args) != 2:
-            print("Usage: connect <ip> <port>")
-            return
-        
+    def connect(self, args):
+        """Connect to peer"""
         ip, port = args
-        try:
-            port = int(port)
-            if self.node.add_peer(ip, port):
-                print(f"Connected to peer: {ip}:{port}")
-            else:
-                print(f"Already connected to peer: {ip}:{port}")
-        except ValueError:
-            print("Port must be a number")
-    
-    def cmd_disconnect(self, args):
-        """Disconnect from a peer"""
-        if len(args) != 2:
-            print("Usage: disconnect <ip> <port>")
-            return
-        
-        ip, port = args
-        try:
-            port = int(port)
-            if self.node.remove_peer(ip, port):
-                print(f"Disconnected from peer: {ip}:{port}")
-            else:
-                print(f"Not connected to peer: {ip}:{port}")
-        except ValueError:
-            print("Port must be a number")
-    
-    def cmd_download(self, args):
-        """Download a file"""
-        if not args:
-            print("Usage: download <result_index>")
-            return
-        
-        try:
-            index = int(args[0])
-            
-            if index < 0 or index >= len(self.search_results):
-                print(f"Invalid result index: {index}")
-                return
-            
-            result = self.search_results[index]
-            
-            if result['peer'] == 'local':
-                print(f"File '{result['filename']}' is already local")
-                return
-            
-            print(f"Downloading '{result['filename']}' from {result['peer'][0]}:{result['peer'][1]}...")
-            
-            # Start download in a separate thread
-            threading.Thread(
-                target=self._download_thread,
-                args=(result['peer'], result['filename']),
-                daemon=True
-            ).start()
-            
-        except ValueError:
-            print("Invalid index. Please provide a number.")
-    
-    def _download_thread(self, peer, filename):
-        """Thread function for downloading"""
-        success = self.node.download_file(peer, filename)
-        
-        if success:
-            print(f"\nDownload completed successfully: {filename}")
+        port = int(port)
+        if self.node.add_peer(ip, port):
+            print(f"Connected to: {ip}:{port}")
         else:
-            print(f"\nDownload failed: {filename}")
+            print(f"Already connected to: {ip}:{port}")
+
+
     
-    def cmd_quit(self, args):
-        """Exit the application"""
-        raise KeyboardInterrupt()
+    def download(self, args):
+        """Download a file"""
+        index = int(args[0])
+        if index < 0 or index >= len(self.search_results):
+            print(f"Invalid index")
+            return
+        
+        result = self.search_results[index]
+        
+        # already local
+        if result['peer'] == 'local':
+            return
+        
+        print(f"Downloading '{result['filename']}' from {result['peer'][0]}:{result['peer'][1]}...")
+        
+        # Download in anothher thread
+        threading.Thread(
+            target=self.download_thread,
+            args=(result['peer'], result['filename']),
+            daemon=True
+        ).start()
+    
+    def download_thread(self, peer, filename):
+        """Thread function for downloading"""
+        self.node.download_file(peer, filename)
+        print(f"\nDownloaded {filename}")

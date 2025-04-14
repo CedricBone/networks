@@ -8,12 +8,13 @@ import json
 import time
 import hashlib
 import utils
+import math
 
 
-CHUNK_SIZE = 1024 * 1024  # 1MB chunk size
+CHUNK_SIZE = 64 * 1024  # 64KB chunk size
 
 class P2PNode:
-    """Simple version P2P file sharing from BitTorrent"""
+    """Modded simple version P2P file sharing from BitTorrent"""
     
     def __init__(self, shared_dir):
         """Init P2P node"""
@@ -64,7 +65,10 @@ class P2PNode:
         """File metadata"""
         file_path_full = os.path.join(self.shared_dir, file_path)
         size = os.path.getsize(file_path_full)
-        num_chunks = (size + CHUNK_SIZE - 1) // CHUNK_SIZE  # Ceiling division
+        if size > 0:
+            num_chunks = math.ceil(size / CHUNK_SIZE)
+        else:
+            num_chunks = 0
         
         # Calc file hash
         file_hash = hashlib.sha256()
@@ -208,8 +212,10 @@ class P2PNode:
         file_hash = hashlib.sha256()
         for i in range(num_chunks):
             chunk_data = self.download_chunk(peer, filename, i)
-            print(f"Downloading chunk {i}...")
+            progress = (i + 1) / num_chunks * 100
+            print(f"Downloading chunk {i+1}/{num_chunks} ({progress}%)...")
             if not chunk_data:
+                print("\nDownload failed: Chunk not received.") # Print error on new line
                 if os.path.exists(temp_path):
                     os.remove(temp_path)
                 return False
@@ -218,6 +224,8 @@ class P2PNode:
             with open(temp_path, 'ab' if i > 0 else 'wb') as f:
                 f.write(chunk_data)
             file_hash.update(chunk_data)
+        
+        print() # Add a newline after the loop completes before hash check
         
         # File integrity!!!!!!!!!!!
         calculated_hash = file_hash.hexdigest()
@@ -394,4 +402,3 @@ class P2PNode:
         with open(file_path, 'rb') as f:
             f.seek(chunk_offset)
             client.sendall(f.read(chunk_size))
-    
