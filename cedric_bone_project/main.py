@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
 """
-Main entry point for P2P file sharing application
+Main for P2P file sharing app
 """
 import argparse
-from node import P2PNode
-from cli import CommandLine
+import node as N
+import cli as C
 
 def main():
-    """Main entry point"""
     parser = argparse.ArgumentParser(description="Basic P2P File Sharing Application")
     parser.add_argument("--dir", default="./shared", help="Directory to share files from")
     
     args = parser.parse_args()
     
-    node = P2PNode(args.dir)
-    cli = CommandLine(node)
+    node = N.P2PNode(args.dir)
+    cli = C.CommandLine(node)
     cli.start()
 
 if __name__ == "__main__":

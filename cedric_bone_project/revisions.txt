@@ -1,3 +1,4 @@
+2fa1c6f - CedricBone, 2025-04-13 19:55:09 -0400 : automatic peer discovery causing too many errors moving to manual (port). Also exchanging size and  hash directly with JSON instead of .torrent metainfo file
 68ac386 - CedricBone, 2025-04-13 16:50:59 -0400 : errors found, simplfing code a bit
 8e9c10c - CedricBone, 2025-04-13 15:06:04 -0400 : Updates and README
 ad177ce - CedricBone, 2025-04-13 01:25:08 -0400 : Adding tests

@@ -61,7 +61,7 @@ You can test the basic functionality by running two instances (peers) of the app
     ```
 2.  **Create a Sample File:** Create a test file in the first shared directory:
     ```bash
-    echo "This is a test file for P2P sharing." > shared1/sample.txt
+    cp docs/Frankenstein.txt shared1
     ```
 
 **Running the Test:**
@@ -199,3 +199,13 @@ This application successfully meets all the technical requirements outlined for 
 5.  **Chunked File Transfer**: Files are transferred in fixed-size chunks (1MB).
 6.  **Verifying File Integrity**: SHA-256 hashing verifies downloaded file integrity.
 7.  **User Interface**: A functional command-line interface is provided.
+
+## References
+
+-   **socket:** [https://docs.python.org/3/library/socket.html](https://docs.python.org/3/library/socket.html)
+-   **json:** [https://docs.python.org/3/library/json.html](https://docs.python.org/3/library/json.html)
+-   **hashlib:** [https://docs.python.org/3/library/hashlib.html](https://docs.python.org/3/library/hashlib.html)
+-   **threading:** [https://docs.python.org/3/library/threading.html](https://docs.python.org/3/library/threading.html)
+-   **os:** [https://docs.python.org/3/library/os.html](https://docs.python.org/3/library/os.html)
+-   **time:** [https://docs.python.org/3/library/time.html](https://docs.python.org/3/library/time.html)
+-   **argparse:** [https://docs.python.org/3/library/argparse.html](https://docs.python.org/3/library/argparse.html)

@@ -1,10 +1,9 @@
-#!/usr/bin/env python3
 """
-Command-line interface for P2P file sharing application
+Command-line interface for P2P file sharing app
 """
 import sys
 import threading
-from utils import format_size
+import utils
 
 class CommandLine:
     """Simple command-line interface for the P2P application"""
@@ -78,7 +77,7 @@ class CommandLine:
         print("\nSearch results:")
         for i, result in enumerate(self.search_results):
             peer_str = "Local" if result['peer'] == 'local' else f"{result['peer'][0]}:{result['peer'][1]}"
-            size_str = format_size(result['size'])
+            size_str = result['size']
             print(f"  [{i}] {result['filename']} ({size_str}) - {peer_str}")
     
     def cmd_list(self, args):
@@ -91,8 +90,7 @@ class CommandLine:
         
         print("\nLocal files:")
         for filename in files:
-            size = self.node.files[filename]['size']
-            size_str = format_size(size)
+            size_str = self.node.files[filename]['size']
             print(f"  {filename} ({size_str})")
     
     def cmd_peers(self, args):
@@ -172,11 +170,7 @@ class CommandLine:
     
     def _download_thread(self, peer, filename):
         """Thread function for downloading"""
-        def progress_callback(progress):
-            sys.stdout.write(f"\rProgress: {progress:.1%}")
-            sys.stdout.flush()
-        
-        success = self.node.download_file(peer, filename, progress_callback)
+        success = self.node.download_file(peer, filename)
         
         if success:
             print(f"\nDownload completed successfully: {filename}")
