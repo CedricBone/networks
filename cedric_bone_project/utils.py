@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Utility functions for P2P file sharing application
+Utility function for P2P file sharing application
 """
 import socket
 
