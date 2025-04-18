@@ -7,8 +7,9 @@ import node as N
 import cli as C
 
 def main():
-    parser = argparse.ArgumentParser(description="Basic P2P File Sharing Application")
-    parser.add_argument("--dir", default="./shared", help="Directory to share files from")
+    # https://docs.python.org/3/library/argparse.html
+    parser = argparse.ArgumentParser(description="P2P")
+    parser.add_argument("--dir", default="./shared", help="Dir to share from")
     
     args = parser.parse_args()
     

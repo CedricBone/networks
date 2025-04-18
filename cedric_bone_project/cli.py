@@ -11,11 +11,11 @@ class CommandLine:
     def __init__(self, node):
         self.node = node
         self.commands = {
-            'search': (self.search, 'Search for files (usage: search <query>)'),
-            'list': (self.list, 'List local files'),
-            'peers': (self.peers, 'List connected peers'),
-            'connect': (self.connect, 'Connect to a peer (usage: connect <ip> <port>)'),
-            'download': (self.download, 'Download a file (usage: download <result_index>)'),
+            'search': (self.search, 'Search for files'),
+            'list': (self.list, 'List files'),
+            'peers': (self.peers, 'List peers'),
+            'connect': (self.connect, 'Connect to a peer'),
+            'download': (self.download, 'Download a file'),
         }
         self.search_results = []
     
@@ -56,7 +56,11 @@ class CommandLine:
     def search(self, args):
         """Search for files"""
 
-        # build query
+        '''
+        query = ''
+        for arg in args:
+            query += arg + ' '
+        '''
         query = ' '.join(args)
 
         # search
@@ -66,13 +70,14 @@ class CommandLine:
         # print results
         print("\nSearch results:")
         for i, result in enumerate(self.search_results):
+            # print(result)
             if result['peer'] == 'local':
                 peer_str = 'Local'
             else:   
                 peer_str = f"{result['peer'][0]}:{result['peer'][1]}"
             size_str = result['size']
 
-            print(f"  [{i}] {result['filename']} ({size_str}) - {peer_str}")
+            print(f" [{i}] {result['filename']} ({size_str}) - {peer_str}")
     
     def list(self, args):
         """List local files"""
@@ -85,6 +90,7 @@ class CommandLine:
     def peers(self, args):
         """List peers"""
         peers = self.node.get_peers()
+        # print(peers)
         print("\nConnected peers:")
         for i, peer in enumerate(peers):
             print(f"  [{i}] {peer[0]}:{peer[1]}")
@@ -103,7 +109,7 @@ class CommandLine:
     def download(self, args):
         """Download a file"""
         index = int(args[0])
-        if index < 0 or index >= len(self.search_results):
+        if (index < 0) or (index >= len(self.search_results)):
             print(f"Invalid index")
             return
         

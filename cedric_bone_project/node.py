@@ -10,8 +10,8 @@ import hashlib
 import utils
 import math
 
-
-CHUNK_SIZE = 64 * 1024  # 64KB chunk size
+# 64KB chunk size 
+CHUNK_SIZE = 64 * 1024  
 
 class P2PNode:
     """Modded simple version P2P file sharing from BitTorrent"""
@@ -24,7 +24,9 @@ class P2PNode:
         
         # peer tracking (done manually)
         self.peers = []  # (ip, port)
-        self.files = {}  # {filename: {size, hash, chunks}}
+        self.files = {} 
+        # print(self.files)]
+
         # lock for making sure threads don't conflict
         self.lock = threading.Lock()
         self.running = False
@@ -81,11 +83,11 @@ class P2PNode:
             'hash': file_hash.hexdigest(),
             'num_chunks': num_chunks
         }
-    
+
+    # Refresh
     def maintenance(self):
         """Periodic maintenance"""
-        while self.running:
-            # Refresh file index
+        while self.running: 
             self.index_files()
             # Sleep because it's periodic
             time.sleep(15)
@@ -219,13 +221,15 @@ class P2PNode:
                 if os.path.exists(temp_path):
                     os.remove(temp_path)
                 return False
-            
-            # Write chunk
+    
             with open(temp_path, 'ab' if i > 0 else 'wb') as f:
                 f.write(chunk_data)
+            
+            #print(file_hash)
             file_hash.update(chunk_data)
+            #print(file_hash)
         
-        print() # Add a newline after the loop completes before hash check
+        print()
         
         # File integrity!!!!!!!!!!!
         calculated_hash = file_hash.hexdigest()
@@ -291,8 +295,8 @@ class P2PNode:
         print(f"Listening on port {self.port}")
         #####
 
+        # https://stackoverflow.com/questions/11865685/handling-a-timeout-error-in-python-sockets
         while self.running:
-            # connection and create client thread
             try:
                 client, addr = server.accept()
                 if not self.running:
@@ -306,7 +310,6 @@ class P2PNode:
             except socket.timeout:
                 pass
         
-        # Clean up
         server.close()
     
     def handle_client(self, client, addr):
@@ -322,15 +325,15 @@ class P2PNode:
         # Parse request
         request = json.loads(data.decode('utf-8'))
         req_type = request.get('type')
+        # print(req_type)
         
         if req_type == 'list':
-            # Handle file list request
             self.handle_list_request(client)
+            
         elif req_type == 'info':
-            # Handle file info request
             self.handle_info_request(client, request)
+
         elif req_type == 'chunk':
-            # Handle chunk request
             self.handle_chunk_request(client, request)
 
         client.close()
