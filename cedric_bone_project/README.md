@@ -25,7 +25,7 @@
    - `connect ip port`: Connect to a peer
    - `download index`: Download a file from search results
 
-## Testing the Application
+## Testing
 
 1.  Shared Directories:
     ```
@@ -67,21 +67,6 @@
 - **utils.py**: Utility function
 - **main.py**: Main
 
-## Protocol
-
-1. Client requests file information (size, hash, number of chunks)
-2. Client requests each chunk separately
-3. After all chunks are downloaded, file integrity is verified using SHA-256 hash
-4. If verification succeeds, the file is saved to the shared directory
-
-
-## Comparison to BitTorrent 
-
-1. manual port connection VS automatic peer discovery 
-2. file info (size, hash) with JSON VS bencoded metainfo
-3. JSON protocol over TCP VS standardized binary peer wire protocol
-4. sequential chunks VS piece selection
-5. SHA-256 for whole-file integrity VS SHA-1 for individual pieces
 
 ## References
 - https://docs.python.org/3/library/socket.html

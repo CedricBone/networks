@@ -22,12 +22,12 @@ class P2PNode:
         os.makedirs(self.shared_dir, exist_ok=True)
         self.port = utils.find_free_port()
         
-        # peer tracking (done manually)
+        # peer tracking (manually)
         self.peers = []  # (ip, port)
         self.files = {} 
         # print(self.files)]
 
-        # lock for making sure threads don't conflict
+        # lock for conflict
         self.lock = threading.Lock()
         self.running = False
     
@@ -36,12 +36,12 @@ class P2PNode:
         self.running = True
         self.index_files()
         
-        # perform multiple tasks concurrently
+        # tasks concurrently
         self.server_thread = threading.Thread(target=self.run_server)
         self.server_thread.daemon = True
         #print("Here")
         self.server_thread.start()
-        # perform maintenance concurrently
+        # maintenance concurrently
         self.maintenance_thread = threading.Thread(target=self.maintenance)
         self.maintenance_thread.daemon = True
         self.maintenance_thread.start()
@@ -214,15 +214,21 @@ class P2PNode:
         file_hash = hashlib.sha256()
         for i in range(num_chunks):
             chunk_data = self.download_chunk(peer, filename, i)
-            progress = (i + 1) / num_chunks * 100
+            progress = ((i + 1) / num_chunks) * 100
             print(f"Downloading chunk {i+1}/{num_chunks} ({progress}%)...")
             if not chunk_data:
-                print("\nDownload failed: Chunk not received.") # Print error on new line
+                print("\nDownload failed")
                 if os.path.exists(temp_path):
                     os.remove(temp_path)
                 return False
-    
-            with open(temp_path, 'ab' if i > 0 else 'wb') as f:
+
+            write = ""
+            if i > 0:
+                write = "ab"
+            else:
+                write = "wb"
+            
+            with open(temp_path, write) as f:
                 f.write(chunk_data)
             
             #print(file_hash)
@@ -302,7 +308,7 @@ class P2PNode:
                 if not self.running:
                     break
                 
-                # Handle client in a new thread
+                # client in new thread
                 threading.Thread(target=self.handle_client, 
                                 args=(client, addr),
                                 daemon=True).start()
