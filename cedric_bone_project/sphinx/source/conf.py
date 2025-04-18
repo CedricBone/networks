@@ -27,7 +27,7 @@ templates_path = ['_templates']
 exclude_patterns = []
 
 
-today = 'April 13, 2025'
+today = 'April 18, 2025'
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
