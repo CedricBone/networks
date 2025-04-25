@@ -47,7 +47,7 @@ class NetworkTopo(Topo):
         self.addLink(s3, rc, intfName1='s3-rc', intfName2='rc-s3',
                       params2={'ip': '20.10.172.193/27'})
         
-        # Connect routers to each other (20.10.100.0/24 network)
+        # Connect routers to routers
         self.addLink(ra, rb, intfName1='ra-rb', intfName2='rb-ra',
                       params1={'ip': '20.10.100.1/24'},
                       params2={'ip': '20.10.100.2/24'})
@@ -76,7 +76,7 @@ class NetworkTopo(Topo):
         hc1 = self.addHost('hc1', ip='20.10.172.194/27',
                            defaultRoute='via 20.10.172.193')
         hc2 = self.addHost('hc2', ip='20.10.172.195/27',
-                           defaultRoute='via 20.100.193')
+                           defaultRoute='via 20.10.172.193')
         
         # Connect hosts to switches
         self.addLink(ha1, s1)
@@ -99,10 +99,6 @@ def run():
         info(net[router].cmd('route'))
         info('\n')
     
-    info('Testing connectivity\n')
-    net.pingAll()
-    
-    info('Starting CLI\n')
     CLI(net)
     net.stop()
 
