@@ -1,16 +1,7 @@
-#!/usr/bin/env python
-
 """
-layer3_network_code.py: Implementation of a network with three routers connected to hosts
-in different subnets according to the specified requirements.
-
-The topology includes three routers (ra, rb, rc) each connected to two hosts.
-The routers are connected to each other with IP addresses in 20.10.100.0/24.
-
-LAN subnetting:
-- LAN B (Router B): 20.10.172.0/25 (126 usable addresses)
-- LAN A (Router A): 20.10.172.128/26 (62 usable addresses)
-- LAN C (Router C): 20.10.172.192/27 (30 usable addresses)
+- LAN B: 20.10.172.0/25
+- LAN A: 20.10.172.128/26
+- LAN C: 20.10.172.192/27
 """
 
 from mininet.topo import Topo
@@ -31,20 +22,24 @@ class LinuxRouter(Node):
         super(LinuxRouter, self).terminate()
 
 class NetworkTopo(Topo):
-    "A network topology with 3 routers and their respective LANs"
+    "A network topology with 3 LANs"
     
     def build(self, **_opts):
+
+        #defaultIP = '192.168.1.1/24'  # IP address for r0-eth1
+        #router = self.addNode( 'r0', cls=LinuxRouter, ip=defaultIP )
+
         # Add routers
-        ra = self.addNode('ra', cls=LinuxRouter, ip='20.10.172.129/26')  # Router A (LAN A)
-        rb = self.addNode('rb', cls=LinuxRouter, ip='20.10.172.1/25')     # Router B (LAN B)
-        rc = self.addNode('rc', cls=LinuxRouter, ip='20.10.172.193/27')   # Router C (LAN C)
+        ra = self.addNode('ra', cls=LinuxRouter, ip='20.10.172.129/26')  # LAN A
+        rb = self.addNode('rb', cls=LinuxRouter, ip='20.10.172.1/25')     # LAN B
+        rc = self.addNode('rc', cls=LinuxRouter, ip='20.10.172.193/27')   # LAN C
         
-        # Add switches for each LAN
-        s1 = self.addSwitch('s1')  # Switch for LAN A
-        s2 = self.addSwitch('s2')  # Switch for LAN B
-        s3 = self.addSwitch('s3')  # Switch for LAN C
+        # Add switches LANs
+        s1 = self.addSwitch('s1')  
+        s2 = self.addSwitch('s2')  
+        s3 = self.addSwitch('s3')
         
-        # Connect routers to their respective LAN switches
+        # Connect routers to switches
         self.addLink(s1, ra, intfName1='s1-ra', intfName2='ra-s1',
                       params2={'ip': '20.10.172.129/26'})
         self.addLink(s2, rb, intfName1='s2-rb', intfName2='rb-s2',
@@ -65,7 +60,7 @@ class NetworkTopo(Topo):
                       params1={'ip': '20.10.100.5/24'},
                       params2={'ip': '20.10.100.6/24'})
         
-        # Add hosts for LAN A
+        # LAN A
         ha1 = self.addHost('ha1', ip='20.10.172.130/26',
                            defaultRoute='via 20.10.172.129')
         ha2 = self.addHost('ha2', ip='20.10.172.131/26',
@@ -77,13 +72,13 @@ class NetworkTopo(Topo):
         hb2 = self.addHost('hb2', ip='20.10.172.3/25',
                            defaultRoute='via 20.10.172.1')
         
-        # Add hosts for LAN C
+        # LAN C
         hc1 = self.addHost('hc1', ip='20.10.172.194/27',
                            defaultRoute='via 20.10.172.193')
         hc2 = self.addHost('hc2', ip='20.10.172.195/27',
-                           defaultRoute='via 20.10.172.193')
+                           defaultRoute='via 20.100.193')
         
-        # Connect hosts to their respective switches
+        # Connect hosts to switches
         self.addLink(ha1, s1)
         self.addLink(ha2, s1)
         self.addLink(hb1, s2)
@@ -104,11 +99,10 @@ def run():
         info(net[router].cmd('route'))
         info('\n')
     
-    info('*** Testing connectivity within each LAN\n')
-    info('*** Running pingall test\n')
+    info('Testing connectivity\n')
     net.pingAll()
     
-    info('*** Starting CLI\n')
+    info('Starting CLI\n')
     CLI(net)
     net.stop()
 
